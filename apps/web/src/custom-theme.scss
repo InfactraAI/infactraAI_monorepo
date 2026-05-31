@@ -1,0 +1,25 @@
+/* MUST be first */
+@use '@angular/material' as mat;
+
+/* Core styles */
+@include mat.core();
+
+/* Define Material 3 theme */
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$blue-palette,
+    tertiary: mat.$cyan-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto',
+  ),
+  density: (
+    scale: 0
+  ),
+));
+
+/* Apply theme */
+:root {
+  @include mat.all-component-themes($theme);
+}

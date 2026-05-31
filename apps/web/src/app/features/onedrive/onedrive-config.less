@@ -1,0 +1,483 @@
+onedrive css
+
+
+/* 
+   PAGE LAYOUT
+*/
+.connector-page-infactra {
+    padding: 40px 20px;
+    background: #fcfcfc;
+    min-height: 100vh;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        sans-serif;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    box-sizing: border-box;
+}
+
+/* 
+   HEADER WRAPPER
+ */
+.page-header-inf {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+/* 
+   HEADER TITLE
+ */
+.section-title-infactra {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-top: 24px;
+    margin-bottom: 12px;
+    padding-left: 16px;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    color: #111827;
+}
+
+/*
+   BREADCRUMB
+ */
+.breadcrumb-infactra {
+    display: flex;
+    align-items: center;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    color: #6b7280;
+}
+
+.arrow-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+
+    color: #9ca3af;
+}
+
+/* 
+   TOP BAR
+ */
+.top-bar-inf {
+    margin-top: 8px;
+}
+
+/* 
+   BACK BUTTON
+*/
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 0;
+    padding-top: 25px;
+padding-left: 32px;
+    border: none;
+    background: transparent;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    color: #111827;
+
+    transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+    opacity: 0.7;
+}
+
+.back-btn mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+}
+
+/*
+   FORM WRAPPER
+ */
+.form-wrapper-inf {
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+}
+
+/* 
+   FORM CARD
+ */
+.form-card-inf {
+    width: 100%;
+    max-width: 650px;
+
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    padding: 34px 40px;
+
+    border: 1px solid #f1f5f9;
+
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.04),
+        0 4px 10px rgba(0, 0, 0, 0.03);
+
+    transition: all 0.25s ease;
+}
+
+.form-card-inf:hover {
+    box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.05),
+        0 10px 25px rgba(0, 0, 0, 0.04);
+}
+
+/* 
+   SUBTITLE
+    */
+.card-subtitle-graph {
+    margin-bottom: 28px;
+
+    font-size: 15px;
+    font-weight: 500;
+
+    color: #4b5563;
+}
+
+/*
+   FORM
+ */
+.form-card-inf form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 
+   LABELS
+*/
+.form-card-inf label {
+    display: block;
+
+    margin-top: 18px;
+    margin-bottom: 7px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #1f2937;
+}
+
+.required {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+/* 
+   INPUTS
+ */
+.form-card-inf input,
+.form-card-inf select {
+    width: 100%;
+    height: 42px;
+
+    padding: 0 14px;
+
+    border-radius: 8px;
+
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+
+    font-size: 14px;
+    color: #111827;
+
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.form-card-inf input::placeholder {
+    color: #9ca3af;
+}
+
+.form-card-inf input:hover,
+.form-card-inf select:hover {
+    border-color: #cbd5e1;
+}
+
+.form-card-inf input:focus,
+.form-card-inf select:focus {
+    outline: none;
+
+    border-color: #2563eb;
+
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+/* 
+   BUTTONS SECTION
+    */
+.form-footer-btn {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    margin-top: 32px;
+}
+
+/* 
+   AUTH BUTTON
+ */
+.auth-btn {
+    height: 40px;
+
+    padding: 0 18px;
+
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+
+    background: #ffffff;
+    color: #374151;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.auth-btn:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+/* 
+   LOAD BUTTON
+ */
+.load-btn {
+    height: 40px;
+
+    padding: 0 20px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #2563eb;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.load-btn:hover {
+    background: #1d4ed8;
+}
+
+/* 
+   LOADING
+ */
+.loading-box {
+    margin-top: 24px;
+    text-align: center;
+}
+
+.loading-box p {
+    margin-top: 10px;
+
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* 
+   FILE WRAPPER
+*/
+.form-wrapper {
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+}
+
+/* 
+   FILE CARD
+ */
+.file-card {
+    width: 100%;
+    max-width: 650px;
+
+    margin-top: 24px;
+
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    padding: 32px 40px;
+
+    border: 1px solid #f1f5f9;
+
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.04),
+        0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+/* 
+   FILE TITLE
+ */
+.file-title {
+    margin-bottom: 20px;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    color: #111827;
+}
+
+/* 
+   FILE ITEM
+ */
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+
+    padding: 14px 16px;
+
+    border: 1px solid #f1f5f9;
+    border-radius: 10px;
+
+    margin-bottom: 12px;
+
+    background: #ffffff;
+
+    transition: all 0.2s ease;
+}
+
+.file-item:hover {
+    border-color: #dbeafe;
+    background: #fafcff;
+}
+
+/* 
+   FILE NAME
+ */
+.file-name {
+    font-size: 14px;
+    font-weight: 500;
+
+    color: #111827;
+
+    word-break: break-word;
+}
+
+/*
+   FILE ACTIONS
+ */
+.file-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* 
+   FILE BUTTONS
+ */
+.sync-btn,
+.open-btn {
+    height: 36px;
+
+    padding: 0 14px;
+
+    border: none;
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.sync-btn {
+    background: #16a34a;
+    color: #ffffff;
+}
+
+.sync-btn:hover {
+    background: #15803d;
+}
+
+.open-btn {
+    background: #f59e0b;
+    color: #ffffff;
+}
+
+.open-btn:hover {
+    background: #d97706;
+}
+
+/* 
+   MOBILE
+ */
+@media (max-width: 640px) {
+
+    .section-title-infactra {
+        font-size: 18px;
+        flex-wrap: wrap;
+    }
+
+    .form-card-inf,
+    .file-card {
+        padding: 24px;
+    }
+
+    .form-footer-btn {
+        flex-direction: column-reverse;
+    }
+
+    .auth-btn,
+    .load-btn {
+        width: 100%;
+    }
+
+    .file-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .file-actions {
+        width: 100%;
+        display: flex;
+    }
+
+    .sync-btn,
+    .open-btn {
+        flex: 1;
+    }
+}
+
+

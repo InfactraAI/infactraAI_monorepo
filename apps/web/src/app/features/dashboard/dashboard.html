@@ -1,0 +1,131 @@
+<div class="dashboard-infactra">
+
+  <div class="header-infactra">
+    <div class="left">Financial Snapshot</div>
+    <div class="right">
+      <span class="updated">
+        <mat-icon class="refresh">schedule</mat-icon>
+        Last updated: May 7, 2025 - 09:15 AM
+      </span>
+      <button class="nav-btn">
+        <mat-icon class="refresh">save_alt</mat-icon>
+        Board Pack
+      </button>
+      <button class="nav-btn primary">
+        <mat-icon class="refresh">autorenew</mat-icon>
+        Refresh Data
+      </button>
+    </div>
+  </div>
+
+  <div class="snapshot-infactra">
+    <div class="card" *ngFor="let card of snapshotCards; let i = index" [ngClass]="card.color">
+      <div class="main-info-card">
+        <div>
+          <div class="title" [attr.data-index]="i">{{card.title}}</div>
+          <div class="value">{{card.value}}</div>
+        </div>
+        <div class="icon">
+          <mat-icon class="svg svg-icon" fontSet="material-icons-outlined" [attr.data-index]="i">
+            {{card.icon}}
+          </mat-icon>
+        </div>
+      </div>
+      <div class="change">
+        <span>
+          <mat-icon *ngIf="i === 0 || i === 1 || i === 3" class="svg-icon-up">arrow_upward</mat-icon>
+          <mat-icon *ngIf="i === 2" class="svg-icon-down">arrow_downward</mat-icon>
+        </span>
+        <span [attr.data-index]="i">{{card.change}}</span>
+        <span class="subtitle">{{card.subtitle}}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-infactra">
+    <mat-card class="chart-card">
+      <div class="header">
+        <span>Cash Flow Projection (13 Weeks)</span>
+        <a>View Full Report <mat-icon>chevron_right</mat-icon></a>
+      </div>
+      <div class="chart-container">
+        <canvas baseChart [data]="barChartData" [type]="barChartType" [options]="barChartOptions"></canvas>
+      </div>
+      <p class="hint">Click on any bar to view detailed breakdown for that week</p>
+    </mat-card>
+
+    <mat-card class="alerts">
+      <div class="alerts-header">
+        <h3>Overdue Receivables</h3>
+        <span class="top-badge">Top 5</span>
+      </div>
+      <div class="alert-card" *ngFor="let item of [1,2,3,4,5]"> <div class="alert-left-content">
+          <div class="alert-dot"></div>
+          <div class="alert-details">
+            <p class="company-name">TechNova Solutions</p>
+            <p class="invoice-info">INV-2023-421 · 15 days overdue</p>
+          </div>
+        </div>
+        <div class="alert-right-actions">
+          <span class="amount">₹25,000</span>
+          <button class="alertbtn-second">Send Reminder</button>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+  <div class="content-infactra">
+    <mat-card class="payables-infactra">
+      <div class="payables-header">
+        <h3>Upcoming Payables (Next 7 Days)</h3>
+      </div>
+      <div class="payables-content">
+        <div class="payable-card" *ngFor="let p of upcomingPayables">
+          <div class="item-info">
+            <p class="name">{{p.name}}</p>
+            <p class="sub-text">{{p.poNumber}} · Due in {{p.dueIn}} days</p>
+          </div>
+          <div class="item-actions">
+            <span class="pay-amount">₹{{p.amount | number}}</span>
+            <div class="button-group">
+              <button class="btn-first">Schedule</button>
+              <button class="paybtn-second">Pay Now</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+
+    <mat-card class="quick-metrics">
+      <div class="quick-header">
+        <h3>Quick Metrics</h3>
+      </div>
+      <div class="quick-content">
+        <div class="metric-item">
+          <div class="metric-label">TOTAL REVENUE</div>
+          <div class="metric-value">₹18.2 L</div>
+          <div class="metric-progress">
+            <div class="progress-fill revenue" style="width: 75%"></div>
+          </div>
+          <div class="metric-subtitle positive">5.1% this week</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">OUTSTANDING</div>
+          <div class="metric-value">₹1.25 L</div>
+          <div class="metric-progress">
+            <div class="progress-fill outstanding" style="width: 85%"></div>
+          </div>
+          <div class="metric-subtitle negative">15 days overdue</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">DUE THIS WEEK</div>
+          <div class="metric-value">₹71,450</div>
+          <div class="metric-progress">
+            <div class="progress-fill due" style="width: 60%"></div>
+          </div>
+          <div class="metric-subtitle warning">5 invoices pending</div>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</div>

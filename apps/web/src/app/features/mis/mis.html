@@ -1,0 +1,934 @@
+<div class="mis-dashboard">
+
+  <!-- TAB NAVIGATION -->
+  <div class="tab-navigation">
+
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'pl'"
+      (click)="setActiveTab('pl')">
+      P&L
+    </button>
+
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'plNotes'"
+      (click)="setActiveTab('plNotes')">
+      P&L Notes
+    </button>
+
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'additional'"
+      (click)="setActiveTab('additional')">
+      Additional Notes & Ratios
+    </button>
+
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'hr'"
+      (click)="setActiveTab('hr')">
+      P&L Notes-1(hr Data)
+    </button>
+
+  </div>
+
+  <!-- ==========
+       P&L TAB
+  ========= -->
+  <div class="tab-content" *ngIf="activeTab === 'pl'">
+
+    <!-- === KPI GRID = -->
+    <div class="kpi-grid">
+
+      <!-- CARD 1 -->
+      <div class="kpi-card border-blue">
+        <div class="kpi-card-content">
+
+          <div class="kpi-info">
+            <div class="kpi-label">Net Profit</div>
+            <div class="kpi-value">₹4,24,404</div>
+            <div class="kpi-trend text-success">
+              ↑ 97% ratio - MAR-24
+            </div>
+          </div>
+
+          <div class="kpi-icon icon-blue">
+            <i class="fas fa-chart-line"></i>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- CARD 2 -->
+      <div class="kpi-card border-green">
+        <div class="kpi-card-content">
+
+          <div class="kpi-info">
+            <div class="kpi-label">Gross Profit</div>
+            <div class="kpi-value">₹4,25,504</div>
+            <div class="kpi-trend text-success">
+              ↑ 98% ratio - MAR-24
+            </div>
+          </div>
+
+          <div class="kpi-icon icon-green">
+            <i class="fas fa-coins"></i>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- CARD 3 -->
+      <div class="kpi-card border-orange">
+        <div class="kpi-card-content">
+
+          <div class="kpi-info">
+            <div class="kpi-label">EBITDA</div>
+            <div class="kpi-value">₹4,24,604</div>
+            <div class="kpi-trend text-success">
+              ↑ 97% ratio - MAR-24
+            </div>
+          </div>
+
+          <div class="kpi-icon icon-orange">
+            <i class="fas fa-percentage"></i>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- CARD 4 -->
+      <div class="kpi-card border-red">
+        <div class="kpi-card-content">
+
+          <div class="kpi-info">
+            <div class="kpi-label">APR-24 Net</div>
+
+            <div class="kpi-value text-danger">
+              -₹30,241
+            </div>
+
+            <div class="kpi-trend text-danger">
+              ↓ -727% ratio - APR-24
+            </div>
+          </div>
+
+          <div class="kpi-icon icon-red">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- == SUMMARY + CHART === -->
+    <div class="middle-grid">
+
+      <!-- SUMMARY TABLE -->
+      <div class="card-container">
+
+        <div class="card-header-bar">
+          <span>P&L Summary — MAR to MAY 2024</span>
+
+          <button class="export-btn">
+            Export
+          </button>
+        </div>
+
+        <table class="summary-table">
+
+          <thead>
+            <tr>
+              <th>Particulars</th>
+              <th>MAR-24</th>
+              <th>APR-24</th>
+              <th>MAY-24</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr>
+              <td>Net Profit</td>
+              <td>4,24,404</td>
+              <td class="text-danger">-30,241</td>
+              <td>1,97,361</td>
+            </tr>
+
+            <tr>
+              <td>Cash Profit</td>
+              <td>4,24,504</td>
+              <td class="text-danger">-30,141</td>
+              <td>1,97,461</td>
+            </tr>
+
+            <tr>
+              <td>EBITDA</td>
+              <td>4,24,604</td>
+              <td class="text-danger">-30,041</td>
+              <td>1,97,561</td>
+            </tr>
+
+            <tr>
+              <td>Gross Profit</td>
+              <td>4,25,504</td>
+              <td class="text-danger">-29,141</td>
+              <td>1,98,461</td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <!-- REVENUE BREAKDOWN -->
+      <div class="card-container">
+
+        <div class="card-header-bar plain">
+          Revenue breakdown — MAY-24
+        </div>
+
+        <div class="chart-container">
+
+          <!-- BAR 1 -->
+          <div class="bar-row">
+
+            <span>Ikea</span>
+
+            <div class="progress-bg">
+              <div
+                class="progress-bar purple"
+                style="width: 80%">
+              </div>
+            </div>
+
+            <span>₹1,000</span>
+
+          </div>
+
+          <!-- BAR 2 -->
+          <div class="bar-row">
+
+            <span>Lamplight</span>
+
+            <div class="progress-bg">
+              <div
+                class="progress-bar teal"
+                style="width: 70%">
+              </div>
+            </div>
+
+            <span>₹1,000</span>
+
+          </div>
+
+          <!-- BAR 3 -->
+          <div class="bar-row">
+
+            <span>Other Income</span>
+
+            <div class="progress-bg">
+              <div
+                class="progress-bar orange"
+                style="width: 50%">
+              </div>
+            </div>
+
+            <span>₹2,600</span>
+
+          </div>
+          <div class="bar-row">
+
+            <span>Home Decor Ltd</span>
+
+            <div class="progress-bg">
+              <div
+                class="progress-bar blue"
+                style="width: 80%">
+              </div>
+            </div>
+
+            <span>₹3,600</span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- == MAIN TABLE == -->
+    <div class="main-table-container">
+
+      <table class="mis-table">
+
+        <thead>
+
+          <tr class="table-month-header">
+
+            <th rowspan="2">
+              PARTICULARS
+            </th>
+
+            <th colspan="2">MAR-24</th>
+            <th colspan="2">APR-24</th>
+            <th colspan="2">MAY-24</th>
+
+          </tr>
+
+          <tr class="table-sub-header">
+
+            <th>Amount</th>
+            <th>Ratio</th>
+
+            <th>Amount</th>
+            <th>Ratio</th>
+
+            <th>Amount</th>
+            <th>Ratio</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <!-- DIRECT INCOME -->
+          <tr class="section-row">
+            <td colspan="7">
+              Direct Income
+            </td>
+          </tr>
+
+          <tr>
+            <td>Ikea</td>
+
+            <td>1,000</td>
+            <td>0%</td>
+
+            <td>1,000</td>
+            <td>24%</td>
+
+            <td>1,000</td>
+            <td>24%</td>
+          </tr>
+
+          <tr>
+            <td>Lamplight</td>
+
+            <td>1,000</td>
+            <td>0%</td>
+
+            <td>1,000</td>
+            <td>24%</td>
+
+            <td>1,000</td>
+            <td>24%</td>
+          </tr>
+
+          <tr>
+            <td>Home Decor Ltd</td>
+
+            <td>12,000</td>
+            <td>0%</td>
+
+            <td>1,000</td>
+            <td>24%</td>
+
+            <td>1,000</td>
+            <td>24%</td>
+          </tr>
+
+
+          <!-- IndIRECT INCOME -->
+          <tr class="section-row">
+            <td colspan="7">
+              Indirect Income
+            </td>
+          </tr>
+
+          <tr>
+            <td>Admin Expenses</td>
+
+            <td>18,000</td>
+            <td>0%</td>
+
+            <td>1,000</td>
+            <td>24%</td>
+
+            <td>1,000</td>
+            <td>24%</td>
+          </tr>
+
+          <tr>
+            <td>Marking</td>
+
+            <td>1,000</td>
+            <td>0%</td>
+
+            <td>1,000</td>
+            <td>24%</td>
+
+            <td>1,000</td>
+            <td>24%</td>
+          </tr>
+
+          <tr>
+            <td>Depreciation</td>
+
+            <td>12,000</td>
+            <td>0%</td>
+
+            <td>1,000</td>
+            <td>24%</td>
+
+            <td>1,000</td>
+            <td>24%</td>
+          </tr>
+
+          <!-- DIRECT EXPENSES -->
+          <tr class="section-row">
+            <td colspan="7">
+              Direct Expenses
+            </td>
+          </tr>
+
+          <tr>
+            <td>Raw Material</td>
+
+            <td>1,20,000</td>
+            <td>28%</td>
+
+            <td>45,000</td>
+            <td>1079%</td>
+
+            <td>28,000</td>
+            <td>671%</td>
+          </tr>
+          
+          <tr>
+            <td>Labour</td>
+
+            <td>1,20,000</td>
+            <td>28%</td>
+
+            <td>45,000</td>
+            <td>1079%</td>
+
+            <td>28,000</td>
+            <td>671%</td>
+          </tr>
+
+          <tr>
+            <td>Overheads</td>
+
+            <td>1,20,000</td>
+            <td>28%</td>
+
+            <td>45,000</td>
+            <td>1079%</td>
+
+            <td>28,000</td>
+            <td>671%</td>
+          </tr>
+
+          <tr>
+            <td>Power & fuel</td>
+
+            <td>1,20,000</td>
+            <td>28%</td>
+
+            <td>45,000</td>
+            <td>1079%</td>
+
+            <td>28,000</td>
+            <td>671%</td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+  <!-- =====
+       P&L NOTES TAB
+  == -->
+  <div
+    class="tab-content"
+    *ngIf="activeTab === 'plNotes'">
+
+    <div class="table-container">
+
+      <table class="mis-table">
+
+        <thead>
+
+          <tr class="main-head">
+
+            <th rowspan="2">
+              PARTICULARS
+            </th>
+
+            <th>MAR-24</th>
+            <th>APR-24</th>
+            <th>MAY-24</th>
+
+          </tr>
+
+          <tr class="sub-head">
+
+            <th>Amount</th>
+            <th>Amount</th>
+            <th>Amount</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <tr class="section-header-row">
+            <td colspan="4">
+              Revenue Breakup
+            </td>
+          </tr>
+
+          <tr>
+            <td>Ikea</td>
+            <td>1,000</td>
+            <td>1,000</td>
+            <td>1,000</td>
+          </tr>
+
+          <tr>
+            <td>Lamplight</td>
+            <td>1,000</td>
+            <td>1,000</td>
+            <td>1,000</td>
+          </tr>
+
+          <tr>
+            <td>Home Decor Ltd</td>
+            <td>1,000</td>
+            <td>1,000</td>
+            <td>1,000</td>
+          </tr>
+          <tr>
+            <td>Consigment Sales</td>
+            <td>1,000</td>
+            <td>1,000</td>
+            <td>1,000</td>
+          </tr>
+
+          <tr class="total-row-blue">
+            <td>Total Direct Income</td>
+            <td>13,700</td>
+            <td>10,800</td>
+            <td>14,800</td>
+          </tr>
+
+          <tr class="section-header-row">
+            <td colspan="4">
+              Expense Breakup
+            </td>
+          </tr>
+
+          <tr>
+            <td>Raw Material</td>
+            <td>1,000</td>
+            <td>1,000</td>
+            <td>1,000</td>
+          </tr>
+
+          <tr>
+            <td>Labour</td>
+            <td>1,000</td>
+            <td>1,000</td>
+            <td>1,000</td>
+          </tr>
+
+          <tr>
+            <td>Power & Fual</td>
+            <td>1,000</td>
+            <td>1,000</td>
+            <td>1,000</td>
+          </tr>
+
+          <tr>
+            <td>Labour</td>
+            <td>1,000</td>
+            <td>1,000</td>
+            <td>1,000</td>
+          </tr>
+
+          <tr class="total-row-blue">
+            <td>Total Direct Income</td>
+            <td>13,700</td>
+            <td>10,800</td>
+            <td>14,800</td>
+          </tr>
+
+          <tr class="section-header-row">
+            <td colspan="4">
+              Indirect Expenses
+            </td>
+          </tr>
+
+          <tr>
+            <td>Admin Express</td>
+            <td>1,000</td>
+            <td>1,000</td>
+            <td>1,000</td>
+          </tr>
+
+          <tr>
+            <td>Marketing</td>
+            <td>1,000</td>
+            <td>1,000</td>
+            <td>1,000</td>
+          </tr>
+
+          <tr>
+            <td>Depreciation</td>
+            <td>1,000</td>
+            <td>1,000</td>
+            <td>1,000</td>
+          </tr>
+
+          <tr class="total-row-blue">
+            <td>Total Direct Income</td>
+            <td>13,700</td>
+            <td>10,800</td>
+            <td>14,800</td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+  <!-- =
+       ADDITIONAL NOTES TAB
+  ===== -->
+  <div
+    class="tab-content"
+    *ngIf="activeTab === 'additional'">
+
+    <div class="two-column-grid">
+
+      <!-- DEBTORS -->
+      <div class="data-card">
+
+        <div class="card-header dark-navy">
+          SUNDRY DEBTORS
+        </div>
+
+        <table class="mis-table">
+
+          <thead>
+            <tr>
+              <th>Months</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr>
+              <td>0-30 Days</td>
+              <td>1,20,000</td>
+            </tr>
+
+            <tr>
+              <td>31-60 Days</td>
+              <td>85,000</td>
+            </tr>
+
+            <tr>
+              <td>61-90 Days</td>
+              <td>1,15,000</td>
+            </tr>
+
+            <tr>
+              <td>91-180 Days</td>
+              <td>95,000</td>
+            </tr>
+
+            <tr>
+              <td> >180 Days</td>
+              <td>75,000</td>
+            </tr>
+
+            <tr class="total-row-blue">
+              <td>Total</td>
+              <td>2,05,000</td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <!-- CREDITORS -->
+      <div class="data-card">
+
+        <div class="card-header dark-navy">
+          SUNDRY CREDITORS
+        </div>
+
+        <table class="mis-table">
+
+          <thead>
+            <tr>
+              <th>Months Name</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+<tr>
+              <td>0-30 Days</td>
+              <td>1,40,000</td>
+            </tr>
+
+            <tr>
+              <td>31-60 Days</td>
+              <td>95,000</td>
+            </tr>
+
+            <tr>
+              <td>61-90 Days</td>
+              <td>1,25,000</td>
+            </tr>
+
+            <tr>
+              <td>91-180 Days</td>
+              <td>65,000</td>
+            </tr>
+
+            <tr>
+              <td> >180 Days</td>
+              <td>65,000</td>
+            </tr>
+
+            <tr class="total-row-blue">
+              <td>Total</td>
+              <td>1,15,000</td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+
+ <!-- Net current assets -->
+      
+      <div class="data-card">
+
+        <div class="card-header dark-navy">
+          NET CURRENT ASSETS(fig in Cr)
+        </div>
+
+        <table class="mis-table">
+
+          <thead>
+            <tr>
+              <th>Particulars</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr>
+              <td>Current Assets</td>
+              <td>45.20</td>
+            </tr>
+
+            <tr>
+              <td>Cash & Bank</td>
+              <td>8.60</td>
+            </tr>
+
+
+            <tr>
+              <td>Debtors</td>
+              <td>28.60</td>
+            </tr>
+
+            <tr>
+              <td>stock</td>
+              <td>6.60</td>
+            </tr>
+
+            <tr>
+              <td>Current Liabilities</td>
+              <td>20.00</td>
+            </tr>
+
+            <tr class="total-row-blue">
+              <td>Total</td>
+              <td>30.20</td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+ <!-- duty drawback -->
+      
+      <div class="data-card">
+
+        <div class="card-header dark-navy">
+          DUTY DRAWBACK
+        </div>
+
+        <table class="mis-table">
+
+          <thead>
+            <tr>
+              <th>Particulars</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr>
+              <td>Duty Drawaback Claim</td>
+              <td>3,70,000</td>
+            </tr>
+
+            <tr>
+              <td>Received</td>
+              <td>2,80,000</td>
+            </tr>
+            <tr>
+              <td>Pending</td>
+              <td>70,000</td>
+            </tr>
+
+            <tr>
+              <td>DBK Rate (%)</td>
+              <td>1.80%</td>
+            </tr>
+            <tr>
+              <td>Export Turnover</td>
+              <td>1,88,88,8889</td>
+            </tr>
+
+          
+
+            <tr class="total-row-blue">
+              <td>Total</td>
+              <td>3,40,000</td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =====
+       HR DATA TAB
+  ==== -->
+  <div
+    class="tab-content"
+    *ngIf="activeTab === 'hr'">
+
+    <div class="table-container">
+
+      <table class="mis-table">
+
+        <thead>
+
+          <tr>
+            <th>Particulars</th>
+            <th>Company</th>
+            <th>Amount</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <tr>
+            <td>Basic Salary</td>
+            <td>Osrim Exports</td>
+            <td>4,20,000</td>
+          </tr>
+
+          <tr>
+            <td>HRA</td>
+            <td>Osrim Exports</td>
+            <td>1,20,000</td>
+          </tr>
+
+          <tr>
+            <td>Bonus</td>
+            <td>Osrim Exports</td>
+            <td>80,000</td>
+          </tr>
+          <tr>
+            <td>PF(Employer)</td>
+            <td>Osrim Exports</td>
+            <td>80,000</td>
+          </tr>
+          <tr>
+            <td>ESI(Employer)</td>
+            <td>Osrim Exports</td>
+            <td>80,000</td>
+          </tr>
+          <tr>
+            <td>Special Allowance</td>
+            <td>Osrim Exports</td>
+            <td>80,000</td>
+          </tr>
+          <tr>
+            <td>Medical Allowance</td>
+            <td>Osrim Exports</td>
+            <td>80,000</td>
+          </tr>
+          <tr>
+            <td>Conveyance</td>
+            <td>Osrim Exports</td>
+            <td>80,000</td>
+          </tr>
+
+          <tr class="total-row-blue">
+            <td>Total CTC</td>
+            <td>-</td>
+            <td>6,20,000</td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

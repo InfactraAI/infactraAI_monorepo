@@ -1,0 +1,261 @@
+{
+  "info": {
+    "name": "Infactra API",
+    "description": "Complete API collection for the Infactra platform.\n\nSet the `base_url` variable to `http://localhost:3000` for dev or `http://localhost` for prod.\nAfter login, the `token` variable is automatically set on the Login request's Tests tab.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000", "type": "string" },
+    { "key": "token",    "value": "",                      "type": "string" },
+    { "key": "userId",   "value": "",                      "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/health", "host": ["{{base_url}}"], "path": ["health"] },
+            "description": "Returns `{ status: 'ok' }` when the server is up."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.token) {",
+                  "  pm.collectionVariables.set('token', res.token);",
+                  "}",
+                  "if (res.user && res.user._id) {",
+                  "  pm.collectionVariables.set('userId', res.user._id);",
+                  "}",
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Token present', () => pm.expect(res.token).to.be.a('string'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@infactra.ai\",\n  \"password\": \"password123\"\n}"
+            },
+            "description": "Returns a JWT. The Tests tab automatically saves it to the `token` collection variable."
+          }
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth","register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demo Admin\",\n  \"email\": \"admin@infactra.ai\",\n  \"password\": \"password123\",\n  \"unitName\": \"Infactra HQ\",\n  \"mobile\": \"9999999999\",\n  \"address\": \"123 Main Street\"\n}"
+            },
+            "description": "Creates a new ADMIN user and sends a welcome email."
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/forgotPassword", "host": ["{{base_url}}"], "path": ["auth","forgotPassword"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@infactra.ai\"\n}"
+            },
+            "description": "Sends a password reset link to the registered email. Link expires in 15 minutes."
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/auth/resetPassword", "host": ["{{base_url}}"], "path": ["auth","resetPassword"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"<reset-token-from-email>\",\n  \"password\": \"newPassword123\"\n}"
+            },
+            "description": "Resets the password using the token from the reset email."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Company",
+      "item": [
+        {
+          "name": "Get Company Profile",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/company/profile", "host": ["{{base_url}}"], "path": ["company","profile"] },
+            "description": "Returns the company name and logo URL. Creates a default record if none exists."
+          }
+        },
+        {
+          "name": "Update Company",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/company/update", "host": ["{{base_url}}"], "path": ["company","update"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Infactra Technologies Pvt Ltd\",\n  \"logo\": \"http://localhost:3000/uploads/logo.png\"\n}"
+            },
+            "description": "Updates the company name and/or logo URL."
+          }
+        },
+        {
+          "name": "Upload Logo",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{base_url}}/company/upload-logo", "host": ["{{base_url}}"], "path": ["company","upload-logo"] },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "src": "",
+                  "description": "Select a PNG/JPG file from your machine"
+                }
+              ]
+            },
+            "description": "Uploads a logo file. Returns the public URL saved in the company record."
+          }
+        }
+      ]
+    },
+    {
+      "name": "OneDrive",
+      "item": [
+        {
+          "name": "Initiate OAuth Login",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/onedrive/login?clientId=YOUR_CLIENT_ID&clientSecret=YOUR_SECRET&redirectUri=http://localhost:3000/onedrive/callback&department=inventory&userId={{userId}}",
+              "host": ["{{base_url}}"],
+              "path": ["onedrive","login"],
+              "query": [
+                { "key": "clientId",     "value": "YOUR_CLIENT_ID" },
+                { "key": "clientSecret", "value": "YOUR_SECRET" },
+                { "key": "redirectUri",  "value": "http://localhost:3000/onedrive/callback" },
+                { "key": "department",   "value": "inventory" },
+                { "key": "userId",       "value": "{{userId}}" }
+              ]
+            },
+            "description": "Redirects the browser to the Microsoft login page. Open in browser, not via Postman Send button.\n\nThe `department` value must match the folder name on the connected OneDrive (e.g. `inventory`, `hr`)."
+          }
+        },
+        {
+          "name": "OAuth Callback (reference)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/onedrive/callback?code=AUTH_CODE&state=BASE64_STATE",
+              "host": ["{{base_url}}"],
+              "path": ["onedrive","callback"],
+              "query": [
+                { "key": "code",  "value": "AUTH_CODE",    "description": "Provided by Microsoft after user consent" },
+                { "key": "state", "value": "BASE64_STATE", "description": "Base64-encoded JSON set by /onedrive/login" }
+              ]
+            },
+            "description": "Microsoft redirects here after the user authorises. Do not call manually — this is for reference only."
+          }
+        },
+        {
+          "name": "List Connected Drives",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/onedrive/getOneDrives?userId={{userId}}",
+              "host": ["{{base_url}}"],
+              "path": ["onedrive","getOneDrives"],
+              "query": [{ "key": "userId", "value": "{{userId}}" }]
+            },
+            "description": "Returns all OneDrive accounts connected for a user, with department, expiry, and connection status."
+          }
+        },
+        {
+          "name": "Sync Excel from OneDrive",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/onedrive/files?userId={{userId}}&department=inventory",
+              "host": ["{{base_url}}"],
+              "path": ["onedrive","files"],
+              "query": [
+                { "key": "userId",     "value": "{{userId}}" },
+                { "key": "department", "value": "inventory", "description": "inventory | hr | any folder name on OneDrive" }
+              ]
+            },
+            "description": "Downloads the Excel file from the OneDrive folder matching `department`, parses it, and saves the result to MongoDB. Returns the processed data."
+          }
+        },
+        {
+          "name": "Get Cached Excel Data",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/onedrive/getExcelInventoryHrData?department=inventory",
+              "host": ["{{base_url}}"],
+              "path": ["onedrive","getExcelInventoryHrData"],
+              "query": [{ "key": "department", "value": "inventory" }]
+            },
+            "description": "Reads previously synced data from MongoDB. No Graph API call is made. Use this for the Inventory and HR tables in the UI."
+          }
+        },
+        {
+          "name": "Download File",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/onedrive/download/:id",
+              "host": ["{{base_url}}"],
+              "path": ["onedrive","download",":id"],
+              "variable": [{ "key": "id", "value": "ONEDRIVE_FILE_ID" }]
+            },
+            "description": "Streams a file from OneDrive to the client. Requires a valid access token for the user."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tally",
+      "item": [
+        {
+          "name": "Connect to Tally",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/tally/connect", "host": ["{{base_url}}"], "path": ["tally","connect"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"host\": \"localhost\",\n  \"port\": 9000\n}"
+            },
+            "description": "Sends an XML request to the Tally ERP instance and returns a parsed JSON response.\n\nTally must be running on the specified host and port with the HTTP XML server enabled."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+<div class="inventory-screen">
+
+    <!-- Header -->
+    <div class="headers">
+        Inventory
+        <button type="button" class="load-btn" (click)="getInventoryFiles()">
+
+            📁 Sync OneDrive Files
+        </button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards-container">
+
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Inventory Turnover</span>
+                <span class="card-value">₹ 0</span>
+                <span class="card-trend upward">
+                    ↑ 4.5%
+                    <span class="trend-text">vs last month</span>
+                </span>
+            </div>
+
+            <div class="card-icon">
+                <mat-icon>payments</mat-icon>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Total Inventory Value</span>
+                <span class="card-value">₹ 0</span>
+                <span class="card-trend downward">
+                    ↓ 1.2%
+                    <span class="trend-text">vs last month</span>
+                </span>
+            </div>
+
+            <div class="card-icon">
+                <mat-icon>money_off</mat-icon>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Dead Stock %</span>
+                <span class="card-value">₹ 0</span>
+                <span class="card-trend upward">
+                    ↑ 3.8%
+                    <span class="trend-text">vs last month</span>
+                </span>
+            </div>
+
+            <div class="card-icon">
+                <mat-icon>account_balance_wallet</mat-icon>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Stock Accuracy %</span>
+                <span class="card-value">0</span>
+                <span class="card-trend neutral">
+                    ↑ 0%
+                    <span class="trend-text">Current Month</span>
+                </span>
+            </div>
+
+            <div class="card-icon">
+                <mat-icon>assignment_ind</mat-icon>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Table Section -->
+    <mat-card class="table-card">
+
+        <div class="table-wrapper">
+
+            <table mat-table [dataSource]="tableData" class="custom-table">
+
+                <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
+
+                    <th mat-header-cell *matHeaderCellDef>
+                        {{ column }}
+                    </th>
+
+                    <td mat-cell *matCellDef="let row">
+                        {{ row[column] }}
+                    </td>
+
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+                <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+            </table>
+
+        </div>
+
+    </mat-card>
+
+</div>

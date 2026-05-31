@@ -1,0 +1,80 @@
+<h3 class="section-title">
+    Desktop tools
+    @if(selectedSource === 'Tally'){
+    <span class="breadcrumb">
+        <mat-icon class="arrow-icon">chevron_right</mat-icon>
+        {{ selectedSource }}
+    </span>
+    }
+</h3>
+<div class="connector-page">
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <button class="back-btn" (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+            Back
+        </button>
+    </div>
+
+    <!-- Center Wrapper -->
+    <div class="form-wrapper">
+
+        <!-- Form Card -->
+        <div class="form-card">
+
+            <!-- Connection Name -->
+            <label>Connection Name <span class="required">*</span></label>
+            <input type="text" placeholder="e.g. Tally Main DB" [(ngModel)]="form.name" />
+
+            <!-- Host -->
+            <label>Host <span class="required">*</span></label>
+            <input type="text" placeholder="localhost or 192.168.1.10" [(ngModel)]="form.host" />
+
+            <!-- Port -->
+            <label>Port <span class="required">*</span></label>
+            <input type="text" placeholder="9000" [(ngModel)]="form.port" />
+
+            <!-- Company -->
+            <label>Company Name <span class="required">*</span></label>
+            <input type="text" placeholder="ABC Pvt Ltd" [(ngModel)]="form.company" />
+
+            <!-- Authentication -->
+            <label>Authentication</label>
+            <select [(ngModel)]="form.authType">
+                <option value="none">No Authentication</option>
+                <option value="basic">Username & Password</option>
+            </select>
+
+            <!-- Conditional fields -->
+            <div *ngIf="form.authType === 'basic'">
+                <label>Username</label>
+                <input type="text" [(ngModel)]="form.username" />
+
+                <label>Password</label>
+                <input type="password" [(ngModel)]="form.password" />
+            </div>
+
+            <!-- Optional Fields -->
+            <div class="optional">
+                <span (click)="toggleOptional()">
+                    <mat-icon>{{ showOptional ? 'expand_more' : 'chevron_right' }}</mat-icon>
+                    Optional fields
+                </span>
+            </div>
+
+            <div *ngIf="showOptional">
+                <label>Sync Interval (mins)</label>
+                <input type="number" placeholder="15" [(ngModel)]="form.syncInterval" />
+            </div>
+
+            <!-- Footer -->
+            <div class="form-footer">
+                <button class="test-btn" (click)="testConnection()">Test Connection</button>
+                <button class="save-btn" (click)="save()">Test & Save</button>
+            </div>
+
+        </div>
+    </div>
+
+</div>

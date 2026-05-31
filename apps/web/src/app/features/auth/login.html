@@ -1,0 +1,255 @@
+
+<div class="login-wrapper">
+
+  <mat-card class="login-card">
+
+    <!-- LOGIN FORM -->
+
+    <ng-container *ngIf="mode === 'login'">
+
+      <h2 class="login-title">Log in</h2>
+
+      <form>
+
+        <div class="field-group">
+
+          <label class="field-label">
+            Username or Email
+          </label>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <input matInput type="email" [(ngModel)]="email" name="email" required />
+          </mat-form-field>
+
+        </div>
+
+        <div class="field-group">
+
+          <div class="password-header">
+
+            <label class="field-label">
+              Password
+            </label>
+
+            <span class="show-password" (click)="hidePassword = !hidePassword">
+              {{ hidePassword ? 'Show' : 'Hide' }}
+            </span>
+
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="password" name="password"
+              required />
+          </mat-form-field>
+
+        </div>
+
+        <div class="remember-row">
+          <input type="checkbox" />
+          <span>Keep me logged in</span>
+        </div>
+
+        <button type="button" mat-raised-button class="login-btn" (click)="login()">
+          Log in
+        </button>
+
+        <div class="form-footer">
+
+          <button type="button" class="link-btn" (click)="toggleMode('forgot')">
+            Forgot password?
+          </button>
+
+          <button type="button" class="link-btn" (click)="toggleMode('register')">
+            Create account
+          </button>
+
+        </div>
+
+      </form>
+
+    </ng-container>
+
+    <!-- REGISTER FORM -->
+
+    <ng-container *ngIf="mode === 'register'">
+
+      <h2 class="login-title">
+        Create account
+      </h2>
+
+      <p class="subtitle">
+        Create your account to continue
+      </p>
+
+      <form>
+
+        <div class="field-group">
+
+          <label class="field-label">
+            Full Name
+          </label>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <input matInput type="text" [(ngModel)]="name" name="name" placeholder="Enter your name" required />
+          </mat-form-field>
+
+        </div>
+
+        <div class="field-group">
+
+          <label class="field-label">
+            Mobile Number
+          </label>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <input matInput type="text" [(ngModel)]="mobile" name="mobile" placeholder="Enter mobile number" required />
+          </mat-form-field>
+
+        </div>
+
+        <div class="field-group">
+
+          <label class="field-label">
+            Email Address
+          </label>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <input matInput type="email" [(ngModel)]="email" name="email" placeholder="Enter your email" required />
+          </mat-form-field>
+
+        </div>
+
+        <div class="field-group">
+
+          <label class="field-label">
+            Address
+          </label>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <input matInput type="text" [(ngModel)]="address" name="address" placeholder="Enter address" />
+          </mat-form-field>
+
+        </div>
+
+        <div class="field-group">
+
+          <div class="password-header">
+
+            <label class="field-label">
+              Password
+            </label>
+
+            <span class="show-password" (click)="hidePassword = !hidePassword">
+              {{ hidePassword ? 'Show' : 'Hide' }}
+            </span>
+
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="password" name="password"
+              placeholder="Create password" required />
+          </mat-form-field>
+
+        </div>
+
+        <div class="field-group">
+
+          <label class="field-label">
+            Confirm Password
+          </label>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="confirmPassword"
+              name="confirmPassword" placeholder="Confirm password" required />
+          </mat-form-field>
+
+        </div>
+
+        <button type="button" mat-raised-button class="login-btn register-btn" (click)="register()">
+          Create Account
+        </button>
+
+        <div class="form-footer">
+
+          <span>
+            Already have an account?
+          </span>
+
+          <button type="button" class="link-btn" (click)="toggleMode('login')">
+            Log in
+          </button>
+
+        </div>
+
+      </form>
+
+    </ng-container>
+
+
+    <!-- FORGOT PASSWORD FORM -->
+
+    <ng-container *ngIf="mode === 'forgot'">
+
+      <h2 class="login-title">
+        Forgot password
+      </h2>
+
+      <p class="subtitle">
+        Enter your email address associated with your account to recover your password.
+      </p>
+
+      <form>
+
+        <!-- EMAIL -->
+
+        <div class="field-group">
+
+          <label class="field-label">
+            Email Address
+          </label>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <input matInput type="email" [(ngModel)]="email" name="forgotEmail" placeholder="Enter your email"
+              required />
+          </mat-form-field>
+
+        </div>
+
+        <!-- BUTTON -->
+
+        <button type="button" mat-raised-button class="login-btn register-btn" (click)="sendResetLink()">
+          Reset Password
+        </button>
+
+        <!-- FOOTER -->
+
+        <div class="form-footer">
+
+          <span>
+            Remember your password?
+          </span>
+
+          <button type="button" class="link-btn" (click)="toggleMode('login')">
+            Back to login
+          </button>
+
+        </div>
+
+      </form>
+
+    </ng-container>
+
+
+
+  </mat-card>
+
+</div>
+
+
+
+
+
+
+
+
+

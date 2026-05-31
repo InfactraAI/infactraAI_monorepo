@@ -1,0 +1,42 @@
+# ── Node ──────────────────────────────────────────────────────────────────────
+apps/api/node_modules/
+apps/web/node_modules/
+# Legacy dirs kept for reference
+infactra.ai/node_modules/
+infactra.ai_backend/node_modules/
+
+# ── Angular build output ──────────────────────────────────────────────────────
+apps/web/dist/
+apps/web/.angular/
+
+# ── Environment / secrets ─────────────────────────────────────────────────────
+# Never commit real env files
+apps/api/.env
+.env
+# Safe to commit
+!.env.example
+!apps/api/.env.example
+
+# ── Uploads (user-generated content) ─────────────────────────────────────────
+apps/api/uploads/
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE ──────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Docker ───────────────────────────────────────────────────────────────────
+# Ignore override files with local secrets
+docker-compose.override.yml

@@ -1,0 +1,175 @@
+
+<div class="connector-page-infactra">
+
+    <!--  HEADER  -->
+    <div class="page-header-inf">
+
+        <h3 class="section-title-infactra">
+            Desktop tools
+
+            <span class="breadcrumb-infactra">
+                <mat-icon class="arrow-icon">chevron_right</mat-icon>
+                OneDrive
+            </span>
+        </h3>
+
+        <!-- BACK BUTTON -->
+        <div class="top-bar-inf">
+            <button class="back-btn" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+                Back
+            </button>
+        </div>
+
+    </div>
+
+    <!--  FORM SECTION  -->
+    <div class="form-wrapper-inf">
+
+        <div class="form-card-inf">
+
+            <p class="card-subtitle-graph">
+                Connect Microsoft Graph API
+            </p>
+
+            <!-- FORM -->
+            <form [formGroup]="configForm">
+
+                <!-- CONNECTION NAME -->
+                <label>
+                    Redirect Uri
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    placeholder="e.g. OneDrive Production"
+                    formControlName="redirectUri" required autocomplete="off">
+
+                <!-- CLIENT ID -->
+                <label>
+                    Client ID
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    placeholder="Enter Client ID"
+                    formControlName="clientId" required autocomplete="off"> 
+
+                <!-- TENANT ID -->
+                <label>
+                    Tenant ID
+                </label>
+
+                <input
+                    type="text"
+                    placeholder="common"
+                    formControlName="tenantId" readonly autocomplete="off">
+
+                <!-- CLIENT SECRET -->
+                <label>
+                    Client Secret
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="password"
+                    placeholder="Enter Client Secret"
+                    formControlName="clientSecret" required autocomplete="off">
+
+                <!-- DEPARTMENT -->
+                <label>Department</label>
+
+                <select formControlName="department">
+                    <option value="inventory">Inventory</option>
+                    <option value="hr">HR</option>
+                </select>
+
+                <!-- BUTTONS -->
+                <div class="form-footer-btn">
+
+                    <button
+                        type="button"
+                        class="auth-btn"
+                        (click)="login()">
+
+                        🔐 Authenticate
+                    </button>
+
+                    <!-- <button
+                        type="button"
+                        class="load-btn"
+                        (click)="getFiles()">
+
+                        📁 Load OneDrive Files
+                    </button> -->
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!--  LOADING -->
+    <div class="loading-box" *ngIf="loading">
+
+        <div class="spinner-border text-primary"></div>
+
+        <p>Loading...</p>
+
+    </div>
+
+    <!--  FILES  -->
+    @if(files.length > 0) {
+
+    <div class="form-wrapper">
+
+        <div class="file-card">
+
+            <h4 class="file-title">
+                📂 Files
+            </h4>
+
+            <!-- @for(file of metadata; track file) { -->
+
+            <div class="file-item">
+
+                <div class="file-name">
+                    {{ metadata.fileName }}
+                </div>
+
+                <div class="file-actions">
+
+                    <button
+                        class="sync-btn"
+                        (click)="syncData(metadata)">
+
+                        Sync
+                    </button>
+
+                    <button
+                        class="open-btn"
+                        (click)="downloadFile(metadata)">
+
+                        Open Excel
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- } -->
+
+        </div>
+
+    </div>
+
+    }
+
+</div>
+
+
+

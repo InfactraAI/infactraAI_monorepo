@@ -1,0 +1,327 @@
+/* =========================================
+   CONTAINER
+========================================= */
+
+.fireai-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 100vh;
+  width: 100%;
+
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+  font-family: 'Inter', sans-serif;
+
+  margin-top: -80px;
+  margin-left: -110px;
+}
+
+/* =========================================
+   CONTENT WRAPPER
+========================================= */
+
+.greeting,
+.upgrade-card,
+.input-container,
+footer {
+  width: 100%;
+  max-width: 820px;
+  text-align: left;
+}
+
+/* =========================================
+   GREETING
+========================================= */
+
+.greeting h1 {
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 700;
+  color: #1a4fa0;
+  margin: 0;
+}
+
+.greeting h2 {
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 700;
+  color: #3b82f6;
+  margin: 4px 0 16px 0;
+}
+
+.greeting p {
+  color: #494e57;
+  font-size: 16px;
+  margin-bottom: 30px;
+}
+
+.greeting.compact h1 { font-size: 22px; margin-bottom: 8px; }
+.greeting.compact h2, .greeting.compact p { display: none; }
+
+/* =========================================
+   SUGGESTIONS
+========================================= */
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 820px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chip mat-icon { font-size: 16px; width: 16px; height: 16px; color: #3b82f6; }
+
+.chip:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+/* =========================================
+   UPGRADE CARD
+========================================= */
+
+.upgrade-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #d0dcff;
+  border-radius: 20px;
+  padding: 20px 24px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.upgrade-card .info { display: flex; align-items: center; gap: 16px; }
+
+.upgrade-card .icon-box {
+  width: 54px; height: 54px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #3b82f6;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.upgrade-card .actions { display: flex; align-items: center; gap: 12px; }
+
+.pro-badge {
+  background: #3b82f6; color: #fff;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px; letter-spacing: 1px;
+}
+
+/* =========================================
+   CHAT BOX
+========================================= */
+
+.chat-box {
+  width: 100%;
+  max-width: 820px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px 0 120px;
+}
+
+/* =========================================
+   MESSAGE ROWS
+========================================= */
+
+.msg-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  animation: fadeUp 0.25s ease;
+}
+.msg-row.user { flex-direction: row-reverse; }
+
+.avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px;
+}
+.user-avatar { background: #2563eb; color: #fff; }
+.ai-avatar { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+.ai-avatar mat-icon { font-size: 20px; width: 20px; height: 20px; }
+
+/* =========================================
+   BUBBLES
+========================================= */
+
+.bubble {
+  max-width: 78%; padding: 14px 18px;
+  border-radius: 18px; font-size: 14px; line-height: 1.6;
+}
+.bubble p { margin: 0 0 10px; }
+.bubble p:last-child { margin-bottom: 0; }
+
+.user-bubble { background: #2563eb; color: #fff; border-bottom-right-radius: 4px; }
+.ai-bubble { background: #f9fafb; border: 1px solid #e5e7eb; color: #111827; border-bottom-left-radius: 4px; }
+
+/* =========================================
+   CHART WRAPPER
+========================================= */
+
+.chart-wrapper {
+  margin-top: 14px;
+  background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 14px; padding: 16px;
+  min-height: 260px; max-height: 360px;
+}
+.chart-wrapper canvas { max-height: 320px !important; }
+
+/* =========================================
+   INPUT CONTAINER
+========================================= */
+
+.input-container {
+  display: flex; flex-direction: column; gap: 8px;
+  width: 100%; margin-top: 24px;
+}
+
+.input-container.pinned {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  background: #fff; padding: 16px 16px 20px;
+  border-top: 1px solid #f3f4f6;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.05);
+  margin-top: 0; z-index: 50;
+}
+
+/* =========================================
+   SEARCH BAR
+========================================= */
+
+.search-bar {
+  display: flex; align-items: center;
+  background: #f9fafb; border: 1px solid #e5e7eb;
+  border-radius: 30px; padding: 6px 10px 6px 16px;
+  transition: all 0.3s ease; position: relative;
+}
+
+.search-bar:hover { border-color: #3b82f6; background: #fff; }
+.search-bar:focus-within { border-color: #2563eb; background: #fff; box-shadow: 0 10px 25px rgba(37,99,235,.12); }
+
+.search-bar input {
+  flex: 1; border: none; outline: none;
+  background: transparent; font-size: 16px; padding: 10px 0;
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.send-btn {
+  background: #2563eb; color: #fff;
+  border: none; border-radius: 50%;
+  width: 36px; height: 36px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.send-btn mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.send-btn:hover:not(:disabled) { background: #1d4ed8; transform: scale(1.05); }
+.send-btn:disabled { background: #d1d5db; cursor: not-allowed; }
+
+.mic-btn {
+  background: #2563eb; color: #fff;
+  border: none; border-radius: 50%;
+  width: 36px; height: 36px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease;
+}
+.mic-btn:hover { background: #1d4ed8; transform: scale(1.05); }
+
+.action-wrapper { display: flex; justify-content: flex-start; align-items: center; width: auto; margin-right: 12px; position: relative; }
+
+.action-btn { background: transparent; border: none; color: #6b7280; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.action-btn mat-icon { font-size: 22px; width: 22px; height: 22px; }
+
+.btn-primary {
+  background: #3b82f6; color: #fff; border: none; border-radius: 12px;
+  padding: 12px 24px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; transition: all 0.3s ease;
+}
+.btn-primary:hover { background: #2563eb; }
+
+.btn-close {
+  width: 42px; height: 42px; border-radius: 12px; border: none;
+  background: #f3f4f6; color: #9ca3af; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
+}
+.btn-close:hover { background: #e5e7eb; color: #6b7280; }
+
+/* =========================================
+   DROPDOWN
+========================================= */
+
+.dropdown-menu {
+  position: absolute; top: 52px; left: 0; width: 240px;
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 16px;
+  padding: 8px; z-index: 1000;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08), 0 2px 10px rgba(0,0,0,.04);
+  animation: dropdownFade 0.2s ease;
+}
+
+.dropdown-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; }
+.dropdown-item:hover { background: #f3f7ff; }
+.dropdown-item mat-icon { color: #6b7280; font-size: 20px; width: 20px; height: 20px; }
+.dropdown-item span { font-size: 14px; font-weight: 500; color: #111827; }
+
+/* =========================================
+   TYPING INDICATOR
+========================================= */
+
+.bubble.typing {
+  display: flex; align-items: center; gap: 5px;
+  padding: 14px 20px; width: 60px;
+}
+.bubble.typing span {
+  width: 7px; height: 7px; background: #9ca3af;
+  border-radius: 50%; animation: bounce 1s infinite;
+}
+.bubble.typing span:nth-child(2) { animation-delay: 0.15s; }
+.bubble.typing span:nth-child(3) { animation-delay: 0.30s; }
+
+.disclaimer { font-size: 11px; color: #9ca3af; text-align: center; margin: 0; }
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
+@keyframes dropdownFade { from { opacity: 0; transform: translateY(-6px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+  .fireai-container { justify-content: flex-start; padding: 40px 20px; margin-left: 0; margin-top: 0; }
+  .upgrade-card { flex-direction: column; align-items: flex-start; gap: 20px; }
+  .bubble { max-width: 92%; }
+}

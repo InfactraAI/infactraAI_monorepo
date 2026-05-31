@@ -1,0 +1,345 @@
+<div class="dashboard-wrapper">
+
+
+
+  <!-- Main Glass Card -->
+  <div class="glass-card">
+
+    <!-- 
+         SNAPSHOT CARDS
+     -->
+    <div class="snapshot-header-grid">
+
+      <div
+        class="snap-card"
+        *ngFor="let card of salarySnapshots"
+        [ngClass]="card.color"
+      >
+
+        <div class="snap-content">
+
+          <div class="snap-info">
+
+            <span class="snap-label">
+              {{ card.title }}
+            </span>
+
+            <h2 class="snap-value">
+              {{ card.value }}
+            </h2>
+
+          </div>
+
+          <div class="snap-icon-wrapper">
+
+            <span class="material-icons">
+              {{ card.icon }}
+            </span>
+
+          </div>
+
+        </div>
+
+        <div class="snap-footer">
+
+          <span
+            class="trend"
+            [class.up]="card.isUp"
+            [class.down]="!card.isUp"
+          >
+            {{ card.isUp ? '↑' : '↓' }}
+            {{ card.change }}
+          </span>
+
+          <span class="snap-subtext">
+            {{ card.subtitle }}
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 
+         TABLE CONTAINER
+    -->
+    <div class="table-container">
+
+      <table class="excel-table">
+
+        <!-- 
+             TABLE HEADER
+         -->
+        <thead>
+
+          <tr>
+
+            <th class="sticky-id">S.N.</th>
+
+            <th>EMP ID</th>
+
+            <th class="name-col-head">
+              NAME
+            </th>
+
+            <th>DEPARTMENT</th>
+
+            <th>GENDER</th>
+
+            <th>DOJ</th>
+
+            <th>COMPANY</th>
+
+            <th>TOTAL DAYS</th>
+
+            <th>PAID DAYS</th>
+
+            <th>EXT TRG HR</th>
+
+            <th>HR RATE</th>
+
+            <th>TRG AMT</th>
+
+            <th>GROSS RATE</th>
+
+            <th>BASIC</th>
+
+            <th>TRAVEL</th>
+
+            <th class="red-text">
+              ARREAR
+            </th>
+
+            <th>GROSS STIPEND</th>
+
+            <th>DEDUCTION</th>
+
+            <th>FEE</th>
+
+            <th class="payable-header">
+              PAYABLE BILL
+            </th>
+
+            <th>A/C NO</th>
+
+            <th>IFSC</th>
+
+          </tr>
+
+        </thead>
+
+        <!-- 
+             TABLE BODY
+         -->
+        <tbody>
+
+          <tr
+            class="data-row"
+            *ngFor="let emp of employees; let i = index"
+          >
+
+            <!-- SERIAL NUMBER -->
+            <td class="sticky-id">
+              {{ i + 1 }}
+            </td>
+
+            <!-- EMPLOYEE ID -->
+            <td>
+              <input
+                type="text"
+                [(ngModel)]="emp.empId"
+                (change)="saveData()"
+              >
+            </td>
+
+            <!-- NAME -->
+            <td>
+              <input
+                type="text"
+                class="name-col"
+                [(ngModel)]="emp.name"
+                (change)="saveData()"
+              >
+            </td>
+
+            <!-- DEPARTMENT -->
+            <td>
+              <input
+                type="text"
+                [(ngModel)]="emp.department"
+                (change)="saveData()"
+              >
+            </td>
+
+            <!-- GENDER -->
+            <td>
+              <input
+                type="text"
+                [(ngModel)]="emp.gender"
+                (change)="saveData()"
+              >
+            </td>
+
+            <!-- DOJ -->
+            <td>
+              <input
+                type="text"
+                [(ngModel)]="emp.doj"
+                (change)="saveData()"
+              >
+            </td>
+
+            <!-- COMPANY -->
+            <td>
+              <input
+                type="text"
+                [(ngModel)]="emp.company"
+                (change)="saveData()"
+              >
+            </td>
+
+            <!-- TOTAL WORK DAYS -->
+            <td>
+              <input
+                type="number"
+                [(ngModel)]="emp.totalWorkedDays"
+                (input)="calculate(emp)"
+              >
+            </td>
+
+            <!-- TOTAL PAYABLE DAYS -->
+            <td>
+              <input
+                type="number"
+                [(ngModel)]="emp.totalPayableWorkedDays"
+                (input)="calculate(emp)"
+              >
+            </td>
+
+            <!-- EXTRA TRAINING HOURS -->
+            <td>
+              <input
+                type="number"
+                [(ngModel)]="emp.extraTrainingHour"
+                (input)="calculate(emp)"
+              >
+            </td>
+
+            <!-- HOUR RATE -->
+            <td>
+              <input
+                type="number"
+                [(ngModel)]="emp.extraTrainingHourRate"
+                (input)="calculate(emp)"
+              >
+            </td>
+
+            <!-- TRAINING AMOUNT -->
+            <td class="readonly">
+              {{ emp.extraTrgHrAmount }}
+            </td>
+
+            <!-- GROSS STIPEND RATE -->
+            <td>
+              <input
+                type="number"
+                [(ngModel)]="emp.grossStipendRate"
+                (input)="calculate(emp)"
+              >
+            </td>
+
+            <!-- BASIC -->
+            <td class="readonly">
+              {{ emp.earningBasic }}
+            </td>
+
+            <!-- TRAVEL -->
+            <td>
+              <input
+                type="number"
+                [(ngModel)]="emp.travelingAllowance"
+                (input)="calculate(emp)"
+              >
+            </td>
+
+            <!-- ARREAR -->
+            <td>
+              <input
+                type="number"
+                [(ngModel)]="emp.arrear"
+                (input)="calculate(emp)"
+              >
+            </td>
+
+            <!-- GROSS STIPEND -->
+            <td class="readonly bold-text">
+              {{ emp.earningGrossStipend }}
+            </td>
+
+            <!-- DEDUCTION -->
+            <td>
+              <input
+                type="number"
+                [(ngModel)]="emp.deductionAmount"
+                (input)="calculate(emp)"
+              >
+            </td>
+
+            <!-- FEE -->
+            <td>
+              <input
+                type="number"
+                [(ngModel)]="emp.fee"
+                (input)="calculate(emp)"
+              >
+            </td>
+
+            <!-- FINAL PAYABLE -->
+            <td class="readonly final-pay">
+              {{ emp.payableBill }}
+            </td>
+
+            <!-- ACCOUNT NUMBER -->
+            <td>
+              <input
+                type="text"
+                [(ngModel)]="emp.bankAccountNo"
+                (change)="saveData()"
+              >
+            </td>
+
+            <!-- IFSC -->
+            <td>
+              <input
+                type="text"
+                [(ngModel)]="emp.ifsc"
+                (change)="saveData()"
+              >
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+    <!-- 
+         FOOTER BUTTONS
+    -->
+    <div class="footer-buttons">
+
+      <button
+        class="btn-add"
+        (click)="addRow()"
+      >
+        + Add New Employee
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

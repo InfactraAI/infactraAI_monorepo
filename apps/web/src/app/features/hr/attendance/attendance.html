@@ -1,0 +1,447 @@
+<div class="dashboard-wrapper">
+
+
+  <!-- 
+      MAIN GLASS CARD
+   -->
+  <div class="glass-card">
+
+  
+  
+
+    <!--
+         SNAPSHOT GRID
+    -->
+    <div class="snapshot-header-grid">
+
+      <div
+        class="snap-card"
+        *ngFor="let card of snapshotCards"
+      >
+
+        <!-- CARD CONTENT -->
+        <div class="snap-content">
+
+          <div class="snap-info">
+
+            <span class="snap-label">
+              {{ card.title }}
+            </span>
+
+            <h2 class="snap-value">
+              {{ card.value }}
+            </h2>
+
+          </div>
+
+          <div class="snap-icon-wrapper">
+
+            <span class="material-icons">
+              {{ card.icon }}
+            </span>
+
+          </div>
+
+        </div>
+
+        <!-- CARD FOOTER -->
+        <div class="snap-footer">
+
+          <span
+            class="trend"
+            [class.up]="card.isUp"
+            [class.down]="!card.isUp"
+          >
+
+            {{ card.isUp ? '↑' : '↓' }}
+            {{ card.change }}
+
+          </span>
+
+          <span class="snap-subtext">
+            {{ card.subtitle }}
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 
+         TABLE CARD
+   -->
+    <div class="table-outer-card">
+
+      <!-- 
+           TABLE HEADER
+       -->
+      <div class="table-header">
+
+        <div class="table-title-section">
+
+      
+          <div class="table-meta">
+
+            <span>
+              Year:
+              <strong>{{ year }}</strong>
+            </span>
+
+            <span>
+              Month:
+              <strong>{{ monthName }}</strong>
+            </span>
+
+            <span>
+              Total Days:
+              <strong>{{ days.length }}</strong>
+            </span>
+
+          </div>
+
+        </div>
+
+        <!-- LEGEND -->
+        <div class="legend-wrapper">
+
+          <div class="legend-item">
+            <span class="legend-dot present-dot"></span>
+            Present
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-dot absent-dot"></span>
+            Absent
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-dot wo-dot"></span>
+            Week Off
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-dot hd-dot"></span>
+            Half Day
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- 
+           RESPONSIVE TABLE
+       -->
+      <div class="table-responsive-container">
+
+        <table class="modern-table">
+
+          <!-- 
+               TABLE HEAD
+         -->
+          <thead>
+
+            <!-- YEAR ROW -->
+            <tr class="meta-info-row">
+
+              <th colspan="2" class="meta-label">
+                Year
+              </th>
+
+              <th class="meta-value">
+                {{ year }}
+              </th>
+
+              <th colspan="3"></th>
+
+              <th class="label-accent">
+                Date
+              </th>
+
+              <th
+                *ngFor="let d of days"
+                [class.sun-header]="sundays.includes(d)"
+              >
+                {{ d }}
+              </th>
+
+              <th colspan="10"></th>
+
+            </tr>
+
+            <!-- MONTH ROW -->
+            <tr class="meta-info-row">
+
+              <th colspan="2" class="meta-label">
+                Month
+              </th>
+
+              <th class="meta-value">
+                {{ monthName }}
+              </th>
+
+              <th colspan="2" class="meta-value">
+                {{ days.length }} Days
+              </th>
+
+              <th></th>
+
+              <th class="label-accent">
+                Type
+              </th>
+
+              <th
+                *ngFor="let d of days"
+                [class.sun-header]="sundays.includes(d)"
+              >
+
+                {{ sundays.includes(d) ? 'H' : 'W' }}
+
+              </th>
+
+              <th
+                colspan="10"
+                class="summary-title-cell"
+              >
+                ATTENDANCE SUMMARY
+              </th>
+
+            </tr>
+
+            <!-- MAIN HEADERS -->
+            <tr class="main-column-headers">
+
+              <th class="sticky-left">
+                Sr.No
+              </th>
+
+              <th>
+                Emp ID
+              </th>
+
+              <th class="name-column">
+                Employee Name
+              </th>
+
+              <th>
+                Father's/Husband Name
+              </th>
+
+              <th>
+                Joining Date
+              </th>
+
+              <th>
+                Department
+              </th>
+
+              <th>
+                Gender
+              </th>
+
+              <!-- DAYS -->
+              <th
+                *ngFor="let day of dayNames; let idx = index"
+                [class.sun-header]="sundays.includes(idx + 1)"
+                class="day-name-vertical"
+              >
+
+                {{ day }}
+
+              </th>
+
+              <!-- SUMMARY -->
+              <th class="sum-h">
+                P
+              </th>
+
+              <th class="sum-h">
+                A
+              </th>
+
+              <th class="sum-h">
+                HD
+              </th>
+
+              <th class="sum-h">
+                OT
+              </th>
+
+              <th class="sum-h">
+                W/O
+              </th>
+
+              <th class="sum-h">
+                CO
+              </th>
+
+              <th class="sum-h">
+                CL
+              </th>
+
+              <th class="sum-h">
+                SUN
+              </th>
+
+              <th class="sum-h">
+                HLD
+              </th>
+
+              <th class="sum-h payable-header">
+                Payable
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <!-- 
+               TABLE BODY
+           -->
+          <tbody>
+
+            <tr
+              *ngFor="let emp of employees; let i = index"
+              class="hover-row"
+            >
+
+              <!-- SR NO -->
+              <td class="sticky-left index-cell">
+                {{ i + 1 }}
+              </td>
+
+              <!-- EMP ID -->
+              <td>
+
+                <input
+                  [(ngModel)]="emp.empId"
+                  (input)="updateCell(emp)"
+                >
+
+              </td>
+
+              <!-- NAME -->
+              <td class="name-cell">
+
+                <input
+                  [(ngModel)]="emp.name"
+                  (input)="updateCell(emp)"
+                >
+
+              </td>
+
+              <!-- FATHER NAME -->
+              <td>
+
+                <input
+                  [(ngModel)]="emp.fatherName"
+                  (input)="updateCell(emp)"
+                >
+
+              </td>
+
+              <!-- DOJ -->
+              <td>
+
+                <input
+                  [(ngModel)]="emp.doj"
+                  (input)="updateCell(emp)"
+                >
+
+              </td>
+
+              <!-- DEPT -->
+              <td>
+
+                <input
+                  [(ngModel)]="emp.dept"
+                  (input)="updateCell(emp)"
+                >
+
+              </td>
+
+              <!-- GENDER -->
+              <td>
+
+                <input
+                  [(ngModel)]="emp.gender"
+                  class="mini-input"
+                  (input)="updateCell(emp)"
+                >
+
+              </td>
+
+              <!-- ATTENDANCE -->
+              <td
+                *ngFor="let d of days"
+                [class.sun-column]="sundays.includes(d)"
+              >
+
+                <input
+                  class="grid-input"
+
+                  [(ngModel)]="emp.attendance[d]"
+
+                  (input)="updateCell(emp)"
+
+                  [style.backgroundColor]="
+                    getCellColor(emp.attendance[d])
+                  "
+                >
+
+              </td>
+
+              <!-- SUMMARY -->
+              <td class="calc-val">
+                {{ emp.p }}
+              </td>
+
+              <td class="calc-val">
+                {{ emp.a }}
+              </td>
+
+              <td class="calc-val">
+                {{ emp.hd }}
+              </td>
+
+              <td class="calc-val">
+                {{ emp.ot }}
+              </td>
+
+              <td class="calc-val">
+                {{ emp.wo }}
+              </td>
+
+              <td class="calc-val">
+                {{ emp.co }}
+              </td>
+
+              <td class="calc-val">
+                {{ emp.cl }}
+              </td>
+
+              <td class="calc-val">
+                {{ emp.sun }}
+              </td>
+
+              <td class="calc-val">
+                {{ emp.hld }}
+              </td>
+
+              <td class="calc-val payable-result">
+                {{ emp.payable }}
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

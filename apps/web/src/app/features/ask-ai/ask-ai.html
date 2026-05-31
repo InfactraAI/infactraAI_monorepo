@@ -1,0 +1,167 @@
+<div class="fireai-container" (click)="closeDropdown()">
+
+  <!-- ── HEADER ─────────────────────────────────────── -->
+  <header class="greeting" [class.compact]="messages.length > 0">
+    <h1>Hi There, <span class="highlight">{{ userName }}</span></h1>
+    <h2>What would you like to know?</h2>
+    @if(messages.length === 0) {
+      <p>Ask anything about your business data — sales, revenue, inventory, cash flow…</p>
+    }
+  </header>
+
+  <!-- ── QUICK SUGGESTIONS (only when empty) ─────────── -->
+  @if(messages.length === 0) {
+    <section class="suggestions">
+      <button class="chip" (click)="quickAsk('Give me 7 days sales data')">
+        <mat-icon>bar_chart</mat-icon> 7-day sales
+      </button>
+      <button class="chip" (click)="quickAsk('Show monthly revenue trend')">
+        <mat-icon>trending_up</mat-icon> Monthly revenue
+      </button>
+      <button class="chip" (click)="quickAsk('Top 5 products')">
+        <mat-icon>emoji_events</mat-icon> Top products
+      </button>
+      <button class="chip" (click)="quickAsk('Expenses breakdown')">
+        <mat-icon>pie_chart</mat-icon> Expenses
+      </button>
+      <button class="chip" (click)="quickAsk('Show profit margin')">
+        <mat-icon>account_balance</mat-icon> Profit margin
+      </button>
+      <button class="chip" (click)="quickAsk('Cash flow last 8 weeks')">
+        <mat-icon>swap_horiz</mat-icon> Cash flow
+      </button>
+    </section>
+  }
+
+  <!-- ── UPGRADE CARD ───────────────────────────────── -->
+  @if(showUpgradeCard && messages.length === 0) {
+    <section class="upgrade-card">
+      <div class="info">
+        <div class="icon-box"><mat-icon>bolt</mat-icon></div>
+        <div class="text">
+          <div class="title-row">
+            <strong>Upgrade to Premium</strong>
+            <span class="pro-badge">PRO</span>
+          </div>
+          <p>Connect live data sources and unlock AI-powered insights.</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-primary">Upgrade Now <mat-icon>arrow_forward</mat-icon></button>
+        <button class="btn-close" (click)="closeUpgradeCard()"><mat-icon>close</mat-icon></button>
+      </div>
+    </section>
+  }
+
+  <!-- ── CHAT MESSAGES ─────────────────────────────── -->
+  @if(messages.length > 0) {
+    <section class="chat-box" #chatBox>
+
+      @for(msg of messages; track $index) {
+
+        <!-- USER BUBBLE -->
+        @if(msg.role === 'user') {
+          <div class="msg-row user">
+            <div class="bubble user-bubble">{{ msg.text }}</div>
+            <div class="avatar user-avatar">{{ userName[0] | uppercase }}</div>
+          </div>
+        }
+
+        <!-- AI BUBBLE -->
+        @if(msg.role === 'ai') {
+          <div class="msg-row ai">
+            <div class="avatar ai-avatar"><mat-icon>smart_toy</mat-icon></div>
+            <div class="bubble ai-bubble">
+
+              <!-- Text -->
+              <p [innerHTML]="formatText(msg.text)"></p>
+
+              <!-- Chart -->
+              @if(msg.chart) {
+                <div class="chart-wrapper">
+                  <canvas
+                    baseChart
+                    [type]="msg.chart.type"
+                    [data]="msg.chart.data"
+                    [options]="msg.chart.options">
+                  </canvas>
+                </div>
+              }
+
+              <!-- Table -->
+              @if(msg.table) {
+                <div class="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        @for(col of msg.table.columns; track $index) {
+                          <th>{{ col }}</th>
+                        }
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for(row of msg.table.rows; track $index) {
+                        <tr>
+                          @for(cell of row; track $index) {
+                            <td>{{ cell }}</td>
+                          }
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+
+            </div>
+          </div>
+        }
+      }
+
+      <!-- TYPING INDICATOR -->
+      @if(isTyping) {
+        <div class="msg-row ai">
+          <div class="avatar ai-avatar"><mat-icon>smart_toy</mat-icon></div>
+          <div class="bubble ai-bubble typing">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      }
+
+    </section>
+  }
+
+  <!-- ── INPUT BAR ──────────────────────────────────── -->
+  <section class="input-container" [class.pinned]="messages.length > 0">
+
+    <div class="search-bar" (click)="$event.stopPropagation()">
+
+      <!-- + dropdown -->
+      <div class="action-wrapper">
+        <button class="action-btn" (click)="toggleDropdown(); $event.stopPropagation()">
+          <mat-icon>add</mat-icon>
+        </button>
+        @if(showDropdown) {
+          <div class="dropdown-menu">
+            <div class="dropdown-item"><mat-icon>table_chart</mat-icon><span>Excel</span></div>
+            <div class="dropdown-item"><mat-icon>storage</mat-icon><span>Tally</span></div>
+            <div class="dropdown-item" (click)="closeDropdown()"><mat-icon>search</mat-icon><span>Investigation Mode</span></div>
+          </div>
+        }
+      </div>
+
+      <input
+        type="text"
+        placeholder="Ask anything… e.g. 'Give me 7 days sales data'"
+        [(ngModel)]="question"
+        (keydown)="onEnter($event)"
+      />
+
+      <button class="send-btn" (click)="askQuestion()" [disabled]="!question.trim()">
+        <mat-icon>send</mat-icon>
+      </button>
+    </div>
+
+    <p class="disclaimer">Showing demo data — connect OneDrive or Tally for live figures.</p>
+  </section>
+
+</div>

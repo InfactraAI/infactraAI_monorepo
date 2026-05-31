@@ -1,0 +1,253 @@
+
+<div class="connectors-page">
+
+    <!-- PAGE TITLE -->
+     <div class="intro-filter-row">
+    <div class="page-intro">
+        <h1>Connected Data Sources</h1>
+        <p>We've got all your needs covered.</p>
+    </div>
+
+    <!-- FILTER TABS -->
+    <div class="filter-tabs">
+        <button class="tab active">All</button>
+        <button class="tab">Warehouse & Data Lakes</button>
+        <button class="tab">Product Analytics</button>
+        <button class="tab">Database</button>
+        <button class="tab">Marketing</button>
+    </div>
+     </div>
+
+<h3 class="section-title">
+    Desktop tools
+    @if(selectedSource){
+    <span class="breadcrumb">
+        <mat-icon class="arrow-icon">chevron_right</mat-icon>
+        {{ selectedSource }}
+    </span>
+    }
+</h3>
+<!-- @if(selectedSource === 'Tally') {
+<app-tally></app-tally>
+}@else { -->
+<div class="card-grid">
+    <!-- Tally -->
+    <div class="card">
+        <div class="card-left">
+            <img src="assets/icons/tally.png" class="icon-img" />
+            <div>
+                <h4>Tally</h4>
+                <p>Database Setup</p>
+            </div>
+        </div>
+        <button class="connect-btn" (click)="connectTally()">Connect</button>
+    </div>
+
+    <!-- OneDrive -->
+    <div class="card">
+        <div class="card-left">
+            <img src="assets/icons/onedrive.png" class="icon-img" />
+            <div>
+                <h4>OneDrive</h4>
+                <p>Cloud Storage</p>
+            </div>
+        </div>
+        <button class="connect-btn" (click)="connectOneDrive()">Connect</button>
+        
+    </div>
+
+</div>
+
+
+
+  <!-- ==== WAREHOUSE ====-->
+    <div class="section">
+        <h3 class="section-title">Warehouse & Data Lakes</h3>
+
+        <div class="card-grid">
+
+            <!-- BigQuery -->
+            <div class="connector-card">
+                <div class="card-left">
+                    <img src="assets/icons/BigQuery.png" class="icon-img" />
+
+                    <div class="card-content">
+                        <h4>BigQuery</h4>
+                        <p>Warehouse & Data Lakes</p>
+                    </div>
+                </div>
+
+                <button class="connect-btn">Connect</button>
+            </div>
+
+            <!-- Google Sheets -->
+            <div class="connector-card">
+                <div class="card-left">
+                    <img src="assets/icons/googlesheet.png" class="icon-img" />
+
+                    <div class="card-content">
+                        <h4>Google Sheets</h4>
+                        <p>Warehouse & Data Lakes</p>
+                    </div>
+                </div>
+
+                <button class="connect-btn">Connect</button>
+            </div>
+
+            <!-- Zoho Books -->
+            <div class="connector-card">
+                <div class="card-left">
+                    <img src="assets/icons/zoho.png" class="icon-img" />
+
+                    <div class="card-content">
+                        <h4>Zoho Books</h4>
+                        <p>Warehouse & Data Lakes</p>
+                    </div>
+                </div>
+
+                <button class="connect-btn">Connect</button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ==== PRODUCT ANALYTICS === -->
+    <div class="section">
+        <h3 class="section-title">Product Analytics</h3>
+
+        <div class="card-grid four-grid">
+
+            <!-- ZohoCRM -->
+            <div class="connector-card">
+                <div class="card-left">
+                    <img src="assets/icons/zoho-crm.png" class="icon-img" />
+
+                    <div class="card-content">
+                        <h4>ZohoCRM</h4>
+                        <p>Product Analytics</p>
+                    </div>
+                </div>
+
+                <button class="connect-btn">Connect</button>
+            </div>
+
+            <!-- Mixpanel -->
+            <div class="connector-card">
+                <div class="card-left">
+                    <img src="assets/icons/mixpanel.png" class="icon-img" />
+
+                    <div class="card-content">
+                        <h4>Mixpanel</h4>
+                        <p>Product Analytics</p>
+                    </div>
+                </div>
+
+                <button class="connect-btn">Connect</button>
+            </div>
+
+            <!-- Amazon -->
+            <div class="connector-card">
+                <div class="card-left">
+                    <img src="assets/icons/amazon.png" class="icon-img" />
+
+                    <div class="card-content">
+                        <h4>Amazon Seller</h4>
+                        <p>Product Analytics</p>
+                    </div>
+                </div>
+
+                <button class="connect-btn">Connect</button>
+            </div>
+
+             <!-- GA -->
+            <div class="connector-card">
+                <div class="card-left">
+                    <img src="assets/icons/analytics.png" class="icon-img" />
+
+                    <div class="card-content">
+                        <h4>Google Analytics</h4>
+                        <p>Product Analytics</p>
+                    </div>
+                </div>
+
+                <button class="connect-btn">Connect</button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ==== DATA BASE ==== -->
+    <div class="section">
+        <h3 class="section-title">Database</h3>
+
+        <div class="card-grid four-grid">
+
+            <!-- ZohoCRM -->
+            <div class="connector-card">
+                <div class="card-left">
+                    <img src="assets/icons/oracle.png" class="icon-img" />
+
+                    <div class="card-content">
+                        <h4>Oracle DB</h4>
+                        <p>Database</p>
+                    </div>
+                </div>
+
+                <button class="connect-btn">Connect</button>
+            </div>
+
+            <!-- mysql -->
+            <div class="connector-card">
+                <div class="card-left">
+                    <img src="assets/icons/mysql.png" class="icon-img" />
+
+                    <div class="card-content">
+                        <h4>MySQL</h4>
+                        <p>Database</p>
+                    </div>
+                </div>
+
+                <button class="connect-btn">Connect</button>
+            </div>
+
+            <!-- Amazon -->
+            <div class="connector-card">
+                <div class="card-left">
+                    <img src="assets/icons/postgresql.jpg" class="icon-img" />
+
+                    <div class="card-content">
+                        <h4>Postgres</h4>
+                        <p>Product Analytics</p>
+                    </div>
+                </div>
+
+                <button class="connect-btn">Connect</button>
+            </div>
+            </div>
+
+
+            <!-- ==== DATA BASE ==== -->
+    <div class="section">
+        <h3 class="section-title">Marketing</h3>
+
+        <div class="card-grid four-grid">
+
+            <!-- ZohoCRM -->
+            <div class="connector-card">
+                <div class="card-left">
+                    <img src="assets/icons/salesforce.webp" class="icon-img" />
+
+                    <div class="card-content">
+                        <h4>Salesforce</h4>
+                        <p>Marketing</p>
+                    </div>
+                </div>
+
+                <button class="connect-btn">Connect</button>
+            </div>
+
+
+
+

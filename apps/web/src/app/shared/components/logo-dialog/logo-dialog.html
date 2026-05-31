@@ -1,0 +1,41 @@
+<div class="settings-page">
+
+    <h2 class="header">Company Settings</h2>
+
+    <div class="settings-card">
+
+        <!-- Logo Upload -->
+        <div class="logo-section">
+            <label>Company Logo</label>
+
+            <div class="logo-preview"
+            >
+                <img [src]="previewUrl || logoUrl" (error)="logoUrl='assets/images/jayanitha.png'"
+                
+               
+                
+                />
+            </div>
+
+            <div class="file-select">
+                <input type="file" (change)="onFileSelect($event)" />
+
+                <button class="upload-btn" [disabled]="!selectedFile" (click)="uploadLogo()">
+                    Upload Logo
+                </button>
+            </div>
+        </div>
+
+        <!-- Company Name -->
+        <div class="form-group">
+            <label>Company Name</label>
+            <input type="text" [(ngModel)]="companyName" />
+        </div>
+
+        <!-- Save Button -->
+        <div class="footer">
+            <button class="save-btn" (click)="saveSettings()">Save Settings</button>
+        </div>
+
+    </div>
+</div>

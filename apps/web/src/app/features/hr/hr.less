@@ -1,0 +1,91 @@
+
+.headers{
+    margin:30px
+}
+
+
+/* ✅ HR-AI Sub Navbar */
+.sub-navbar {
+    display: flex;
+    gap: 15px;
+    padding: 10px 20px;
+    margin: 10px 10px 0 10px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    align-items: center;
+    
+}
+
+/* Buttons */
+.sub-navbar button {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid #d1d5db;
+    background-color: #f8fafc;
+    color: oklch(55.1% .027 264.364);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Hover effect */
+.sub-navbar button:hover {
+    background-color: #1976d2;
+    color: #ffffff;
+    border-color: #1976d2;
+}
+
+/* Active route (very useful) */
+.sub-navbar button.active {
+    background-color: #1976d2;
+    color: #ffffff;
+    border-color: #1976d2;
+}
+
+/* The button will look like this when it's open (default Attendance) */
+.active-btn {
+  background: #3b82f6 !important;
+  color: white !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+}
+
+.content-area {
+  padding: 20px;
+}
+
+
+.date-picker {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  color: #495057;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.date-picker:focus {
+  border-color: #4a90e2; /* Match your primary blue */
+}
+
+/* Ensure buttons still look like your screenshot */
+.sub-navbar button {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.active-btn {
+  background-color: #4a90e2 !important;
+  
+}
+
+.nav-controls {
+    
+    margin-left: auto;
+}

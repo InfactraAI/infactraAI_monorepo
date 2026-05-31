@@ -1,0 +1,31 @@
+
+
+<!-- ✅ HR-AI Sub Navbar -->
+<div class="sub-navbar">
+
+  <button 
+    routerLink="attendance" 
+    routerLinkActive="active-btn"
+    [routerLinkActiveOptions]="{exact: true}">
+    Attendance
+  </button>
+  
+  <button 
+    routerLink="salary" 
+    routerLinkActive="active-btn">
+    Salary
+  </button>
+
+<div class="nav-controls">
+    <input 
+      type="date" 
+      [(ngModel)]="selectedDate" 
+      (change)="onDateChange($event)"
+      class="date-picker">
+  </div>
+
+</div>
+
+<div class="content-area">
+  <router-outlet></router-outlet>
+</div>

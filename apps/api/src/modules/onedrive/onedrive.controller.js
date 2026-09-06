@@ -1,48 +1,82 @@
 const axios = require('axios');
 const qs = require('querystring');
-const xlsx = require('xlsx');
-const mongoose = require('mongoose');
 
 const UserToken = require('../../models/UserToken');
 const FileData = require('../../models/FileData');
 const { getValidAccessToken } = require('../../utils/token');
 const { parseExcelFromUrl } = require('../../utils/fileParser');
+const { encrypt } = require('../../utils/crypto');
+const oauthState = require('../../utils/oauthState');
 
-// ─── OAuth login redirect ─────────────────────────────────────────────────
+const STATE_PURPOSE = 'onedrive-oauth';
 
-exports.login = (req, res) => {
-  const { clientId, clientSecret, redirectUri, department, userId } = req.query;
-  const tenantId = 'common';
+function azureConfig() {
+  const clientId     = process.env.CLIENT_ID;
+  const clientSecret = process.env.CLIENT_SECRET;
+  const redirectUri  = process.env.REDIRECT_URI;
+  const tenantId     = process.env.TENANT_ID || 'common';
 
-  const state = Buffer.from(
-    JSON.stringify({ tenantId, clientId, clientSecret, redirectUri, department, userId })
-  ).toString('base64');
+  if (!clientId || !clientSecret || !redirectUri) {
+    const err = new Error(
+      'OneDrive is not configured on the server. Set CLIENT_ID, CLIENT_SECRET and REDIRECT_URI.'
+    );
+    err.status = 503;
+    throw err;
+  }
+  return { clientId, clientSecret, redirectUri, tenantId };
+}
 
-  const url =
-    `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?` +
-    qs.stringify({
-      client_id: clientId,
-      response_type: 'code',
-      redirect_uri: redirectUri?.trim(),
-      response_mode: 'query',
-      scope: 'User.Read Files.Read Files.Read.All offline_access',
-      state,
+const returnTo = (params) =>
+  `${process.env.FRONTEND_URL || 'http://localhost'}/one-drive-config?${new URLSearchParams(params).toString()}`;
+
+// ─── OAuth ──────────────────────────────────────────────────────────────────
+
+/**
+ * Returns the consent URL rather than redirecting, so the SPA can call this
+ * with its Bearer token and then navigate itself.
+ *
+ * The Azure app is platform config in env — tenants no longer paste a client
+ * secret into a form, and it no longer travels through the URL bar.
+ */
+exports.login = (req, res, next) => {
+  try {
+    const { clientId, redirectUri, tenantId } = azureConfig();
+    const { department } = req.query;
+
+    if (!department) return res.status(400).json({ message: 'department is required' });
+
+    const state = oauthState.sign(STATE_PURPOSE, {
+      orgId: req.orgId,
+      uid: req.userId,
+      department,
     });
 
-  res.redirect(url);
+    const url =
+      `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?` +
+      qs.stringify({
+        client_id: clientId,
+        response_type: 'code',
+        redirect_uri: redirectUri,
+        response_mode: 'query',
+        scope: 'User.Read Files.Read Files.Read.All offline_access',
+        state,
+      });
+
+    res.json({ url });
+  } catch (err) {
+    next(err);
+  }
 };
 
-// ─── OAuth callback ───────────────────────────────────────────────────────
+exports.callback = async (req, res) => {
+  const { code, state, error } = req.query;
 
-exports.callback = async (req, res, next) => {
-  const { code, state } = req.query;
-  if (!code) return res.status(400).send('Missing code');
+  if (error) return res.redirect(returnTo({ onedrive: 'error', reason: error }));
+  if (!code) return res.redirect(returnTo({ onedrive: 'error', reason: 'missing_code' }));
 
   try {
-    const { tenantId, clientId, clientSecret, redirectUri, department, userId } = JSON.parse(
-      Buffer.from(state, 'base64').toString()
-    );
-    if (!userId) return res.status(400).send('Missing userId');
+    const { orgId, uid, department } = oauthState.verify(STATE_PURPOSE, state);
+    const { clientId, clientSecret, redirectUri, tenantId } = azureConfig();
 
     const tokenRes = await axios.post(
       `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
@@ -61,42 +95,44 @@ exports.callback = async (req, res, next) => {
     const meRes = await axios.get('https://graph.microsoft.com/v1.0/me', {
       headers: { Authorization: `Bearer ${access_token}` },
     });
-
     const { id: accountId, userPrincipalName: email } = meRes.data;
 
-    let user = await UserToken.findOne({ userId });
-    if (!user) user = new UserToken({ userId, oneDrives: [] });
+    let conn = await UserToken.findOne({ orgId });
+    if (!conn) conn = new UserToken({ orgId, userId: uid, oneDrives: [] });
+    conn.userId = uid;
 
-    user.oneDrives.forEach((d) => { d.active = false; });
+    conn.oneDrives.forEach((d) => { d.active = false; });
 
     const drive = {
-      accountId, email, accessToken: access_token, refreshToken: refresh_token,
-      department, expiry: new Date(Date.now() + (expires_in || 3600) * 1000), active: true,
+      accountId,
+      email,
+      department,
+      accessToken: encrypt(access_token),
+      refreshToken: encrypt(refresh_token),
+      expiry: new Date(Date.now() + (expires_in || 3600) * 1000),
+      active: true,
     };
 
-    const idx = user.oneDrives.findIndex((d) => d.accountId === accountId);
-    if (idx > -1) user.oneDrives[idx] = drive;
-    else user.oneDrives.push(drive);
+    const idx = conn.oneDrives.findIndex((d) => d.accountId === accountId);
+    if (idx > -1) conn.oneDrives[idx].set(drive);
+    else conn.oneDrives.push(drive);
 
-    await user.save();
+    await conn.save();
 
-    res.redirect(`${process.env.FRONTEND_URL}?login=success`);
+    res.redirect(returnTo({ onedrive: 'connected', email: email || '' }));
   } catch (err) {
-    next(err);
+    const reason = err.response?.data?.error_description || err.message || 'connect_failed';
+    res.redirect(returnTo({ onedrive: 'error', reason }));
   }
 };
 
-// ─── List connected drives ────────────────────────────────────────────────
+// ─── Connected drives ───────────────────────────────────────────────────────
 
 exports.getOneDrives = async (req, res, next) => {
   try {
-    const { userId } = req.query;
-    if (!userId) return res.status(400).json({ message: 'userId is required' });
+    const conn = await UserToken.findOne({ orgId: req.orgId }).lean();
 
-    const user = await UserToken.findOne({ userId }).lean();
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    const oneDrives = (user.oneDrives || []).map((d) => ({
+    const oneDrives = (conn?.oneDrives || []).map((d) => ({
       accountId: d.accountId,
       email: d.email,
       expiry: d.expiry,
@@ -105,30 +141,29 @@ exports.getOneDrives = async (req, res, next) => {
       active: d.active || false,
     }));
 
-    res.json({ success: true, userId, totalAccounts: oneDrives.length, oneDrives });
+    res.json({ success: true, totalAccounts: oneDrives.length, oneDrives });
   } catch (err) {
     next(err);
   }
 };
 
-// ─── Sync files from OneDrive → MongoDB ──────────────────────────────────
+// ─── Sync files from OneDrive → MongoDB ────────────────────────────────────
 
 exports.getFiles = async (req, res, next) => {
   try {
-    const { userId, department } = req.query;
+    const { department } = req.query;
+    if (!department) return res.status(400).json({ message: 'department is required' });
 
-    const user = await UserToken.findOne({ userId });
-    if (!user) return res.status(401).json({ message: 'User not found' });
+    const conn = await UserToken.findOne({ orgId: req.orgId });
+    if (!conn) return res.status(404).json({ message: 'OneDrive not connected' });
 
-    const drive = user.oneDrives.find((d) => d.department === department);
-    if (!drive) return res.status(404).json({ message: 'OneDrive not found' });
+    const drive = conn.oneDrives.find((d) => d.department === department);
+    if (!drive) return res.status(404).json({ message: 'No OneDrive connected for that department' });
 
-    const accessToken = await getValidAccessToken(userId, drive.accountId);
-
+    const accessToken = await getValidAccessToken(req.orgId, drive.accountId);
     const headers = { Authorization: `Bearer ${accessToken}` };
-    const root = await axios.get(
-      'https://graph.microsoft.com/v1.0/me/drive/root/children', { headers }
-    );
+
+    const root = await axios.get('https://graph.microsoft.com/v1.0/me/drive/root/children', { headers });
 
     const folder = root.data.value.find(
       (i) => i.folder && i.name.trim().toLowerCase() === department.trim().toLowerCase()
@@ -139,9 +174,7 @@ exports.getFiles = async (req, res, next) => {
       `https://graph.microsoft.com/v1.0/me/drive/items/${folder.id}/children`, { headers }
     );
 
-    const excelFile = folderItems.data.value.find(
-      (f) => f.file && /\.(xlsx|xls|xlsm)$/i.test(f.name)
-    );
+    const excelFile = folderItems.data.value.find((f) => f.file && /\.(xlsx|xls|xlsm)$/i.test(f.name));
     if (!excelFile) return res.status(404).json({ message: 'Excel file not found' });
 
     const rawData = await parseExcelFromUrl(excelFile['@microsoft.graph.downloadUrl']);
@@ -159,25 +192,39 @@ exports.getFiles = async (req, res, next) => {
         return newRow;
       });
 
-    await FileData.deleteMany({ department });
-    const saved = await FileData.findOneAndUpdate(
-      { fileName: excelFile.name },
-      { $set: { department, fileType: department, fileName: excelFile.name, columns, data: processedData, updatedAt: new Date() } },
-      { returnDocument: 'after', upsert: true }
-    );
+    // A department holds one dataset per organisation.
+    await FileData.deleteMany({ orgId: req.orgId, department });
+    const saved = await FileData.create({
+      orgId: req.orgId,
+      department,
+      fileType: department,
+      fileName: excelFile.name,
+      columns,
+      data: processedData,
+    });
 
-    res.json({ success: true, folderName: folder.name, fileName: excelFile.name, totalRows: processedData.length, data: saved });
+    res.json({
+      success: true,
+      folderName: folder.name,
+      fileName: excelFile.name,
+      totalRows: processedData.length,
+      data: saved,
+    });
   } catch (err) {
     next(err);
   }
 };
 
-// ─── Read cached data from MongoDB ───────────────────────────────────────
+// ─── Read cached data ───────────────────────────────────────────────────────
 
 exports.getInventoryData = async (req, res, next) => {
   try {
     const { department } = req.query;
-    const record = await FileData.findOne({ department }, { fileName: 1, columns: 1, data: 1 });
+
+    const record = await FileData.findOne(
+      { orgId: req.orgId, department },
+      { fileName: 1, columns: 1, data: 1 }
+    );
     if (!record) return res.status(404).json({ message: 'Data not found' });
 
     res.json({
@@ -192,15 +239,20 @@ exports.getInventoryData = async (req, res, next) => {
   }
 };
 
-// ─── Download a file from OneDrive ───────────────────────────────────────
+// ─── Download ───────────────────────────────────────────────────────────────
 
 exports.downloadFile = async (req, res, next) => {
   try {
-    const token = await getValidAccessToken(req.userId, req.query.accountId);
+    const { accountId } = req.query;
+    if (!accountId) return res.status(400).json({ message: 'accountId is required' });
+
+    const token = await getValidAccessToken(req.orgId, accountId);
+
     const response = await axios.get(
       `https://graph.microsoft.com/v1.0/me/drive/items/${req.params.id}/content`,
       { headers: { Authorization: `Bearer ${token}` }, responseType: 'stream' }
     );
+
     res.setHeader('Content-Disposition', 'attachment');
     response.data.pipe(res);
   } catch (err) {

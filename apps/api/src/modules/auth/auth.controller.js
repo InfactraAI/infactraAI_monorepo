@@ -1,17 +1,21 @@
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
 
 const User = require('../../models/User');
+const Organization = require('../../models/Organization');
+const mailer = require('../../utils/mailer');
 
 const SALT_ROUNDS = 12;
+const TOKEN_TTL = '8h';
 
-function mailer() {
-  return nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-  });
+/** Every token is org-scoped — authenticate rejects tokens without an orgId. */
+function signToken(user) {
+  return jwt.sign(
+    { id: user._id, role: user.role, orgId: user.orgId },
+    process.env.JWT_SECRET,
+    { expiresIn: TOKEN_TTL }
+  );
 }
 
 exports.login = async (req, res, next) => {
@@ -26,41 +30,84 @@ exports.login = async (req, res, next) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: '8h',
-    });
+    const org = await Organization.findById(user.orgId);
+    if (!org?.active) {
+      return res.status(403).json({ message: 'This organisation is no longer active.' });
+    }
 
     const userObj = user.toObject();
     delete userObj.password;
-    res.json({ token, user: userObj });
+
+    res.json({
+      token: signToken(user),
+      user: userObj,
+      organization: { id: org._id, name: org.name, logo: org.logo },
+    });
   } catch (err) {
     next(err);
   }
 };
 
+/**
+ * Registration creates a new organisation and its first user, who becomes the
+ * owner and an ADMIN of *that organisation only*. Joining an existing
+ * organisation is a separate invite flow, not this endpoint.
+ */
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, password, unitName, mobile, address } = req.body;
-    if (!name || !email || !password || !unitName)
-      return res.status(400).json({ message: 'Required fields missing' });
+    const { name, email, password, organizationName, mobile, address } = req.body;
 
-    if (await User.findOne({ email }))
+    // organizationName replaces the old unitName, which the API required and
+    // no client ever sent.
+    if (!name || !email || !password || !organizationName) {
+      return res.status(400).json({
+        message: 'Name, email, password and organisation name are required',
+      });
+    }
+
+    if (await User.findOne({ email })) {
       return res.status(409).json({ message: 'Email already exists' });
+    }
 
-    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-    const user = await User.create({
-      name, email, mobile, password: hashedPassword,
-      unit: unitName, address, role: 'ADMIN',
+    const org = await Organization.create({ name: organizationName.trim() });
+
+    let user;
+    try {
+      user = await User.create({
+        orgId: org._id,
+        name,
+        email,
+        mobile,
+        address,
+        password: await bcrypt.hash(password, SALT_ROUNDS),
+        role: 'ADMIN',
+      });
+    } catch (err) {
+      // Don't strand an empty organisation if user creation fails.
+      await Organization.deleteOne({ _id: org._id });
+      throw err;
+    }
+
+    org.ownerId = user._id;
+    await org.save();
+
+    // Never email a password. Point at the login page instead.
+    mailer
+      .send({
+        to: email,
+        subject: 'Welcome to Infactra',
+        html: `<h3>Welcome ${name}</h3>
+               <p>Your organisation <strong>${org.name}</strong> is ready.</p>
+               <p>Sign in with <strong>${email}</strong> and the password you chose.</p>
+               <a href="${process.env.FRONTEND_URL}/login">Sign in</a>`,
+      })
+      .catch(() => {});
+
+    res.status(201).json({
+      message: 'Organisation created',
+      userId: user._id,
+      organization: { id: org._id, name: org.name },
     });
-
-    await mailer().sendMail({
-      to: email,
-      subject: 'Account Created — Infactra',
-      html: `<h3>Welcome ${name}</h3><p>Email: ${email}</p><p>Password: ${password}</p>
-             <a href="${process.env.FRONTEND_URL}/login">Login</a>`,
-    });
-
-    res.json({ message: 'User registered successfully', userId: user._id });
   } catch (err) {
     next(err);
   }
@@ -78,7 +125,7 @@ exports.forgotPassword = async (req, res, next) => {
     await user.save();
 
     const resetLink = `${process.env.FRONTEND_URL}/resetPassword?token=${token}`;
-    await mailer().sendMail({
+    await mailer.send({
       to: email,
       subject: 'Reset Password — Infactra',
       html: `<p>Click to reset (expires in 15 min):</p><a href="${resetLink}">${resetLink}</a>`,
@@ -93,6 +140,10 @@ exports.forgotPassword = async (req, res, next) => {
 exports.resetPassword = async (req, res, next) => {
   try {
     const { token, password } = req.body;
+    if (!token || !password) {
+      return res.status(400).json({ message: 'Token and password are required' });
+    }
+
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
     const user = await User.findOne({

@@ -1,175 +1,74 @@
+<div class="gs-screen">
 
-<div class="connector-page-infactra">
+  <div class="gs-header">
+    <button class="back-btn" type="button" (click)="goBack()" aria-label="Go back">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
 
-    <!--  HEADER  -->
-    <div class="page-header-inf">
+    <img src="assets/icons/onedrive.png" class="gs-logo" alt="" />
 
-        <h3 class="section-title-infactra">
-            Desktop tools
+    <div class="gs-title">
+      <h2>OneDrive</h2>
+      <p>Import an Excel workbook from your Microsoft account.</p>
+    </div>
+  </div>
 
-            <span class="breadcrumb-infactra">
-                <mat-icon class="arrow-icon">chevron_right</mat-icon>
-                OneDrive
-            </span>
-        </h3>
+  @if (loading) {
+    <div class="gs-card gs-empty"><p>Checking your OneDrive connections…</p></div>
+  } @else {
 
-        <!-- BACK BUTTON -->
-        <div class="top-bar-inf">
-            <button class="back-btn" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
-                Back
-            </button>
-        </div>
+    <div class="gs-card">
+      <h3>Connect a folder</h3>
+      <p class="lede">
+        Pick where the data should land, then sign in with Microsoft. Infactra looks for a
+        Drive folder named after the department and imports the first workbook inside it.
+      </p>
 
+      <div class="dept-row">
+        @for (d of departments; track d.key) {
+          <label class="dept-option" [class.selected]="selectedDepartment === d.key">
+            <input type="radio" name="department" [value]="d.key" [(ngModel)]="selectedDepartment" />
+            <span class="dept-name">{{ d.label }}</span>
+            <span class="dept-feeds">Feeds {{ d.feeds }}</span>
+            @if (driveFor(d.key); as drive) {
+              <span class="dept-warn">Connected as {{ drive.email }}</span>
+            }
+          </label>
+        }
+      </div>
+
+      <button class="btn-primary" type="button" (click)="connect()" [disabled]="busy">
+        <mat-icon>link</mat-icon>
+        {{ busy ? 'Working…' : 'Continue with Microsoft' }}
+      </button>
     </div>
 
-    <!--  FORM SECTION  -->
-    <div class="form-wrapper-inf">
+    <div class="gs-card">
+      <h3>Connected accounts</h3>
 
-        <div class="form-card-inf">
-
-            <p class="card-subtitle-graph">
-                Connect Microsoft Graph API
-            </p>
-
-            <!-- FORM -->
-            <form [formGroup]="configForm">
-
-                <!-- CONNECTION NAME -->
-                <label>
-                    Redirect Uri
-                    <span class="required">*</span>
-                </label>
-
-                <input
-                    type="text"
-                    placeholder="e.g. OneDrive Production"
-                    formControlName="redirectUri" required autocomplete="off">
-
-                <!-- CLIENT ID -->
-                <label>
-                    Client ID
-                    <span class="required">*</span>
-                </label>
-
-                <input
-                    type="text"
-                    placeholder="Enter Client ID"
-                    formControlName="clientId" required autocomplete="off"> 
-
-                <!-- TENANT ID -->
-                <label>
-                    Tenant ID
-                </label>
-
-                <input
-                    type="text"
-                    placeholder="common"
-                    formControlName="tenantId" readonly autocomplete="off">
-
-                <!-- CLIENT SECRET -->
-                <label>
-                    Client Secret
-                    <span class="required">*</span>
-                </label>
-
-                <input
-                    type="password"
-                    placeholder="Enter Client Secret"
-                    formControlName="clientSecret" required autocomplete="off">
-
-                <!-- DEPARTMENT -->
-                <label>Department</label>
-
-                <select formControlName="department">
-                    <option value="inventory">Inventory</option>
-                    <option value="hr">HR</option>
-                </select>
-
-                <!-- BUTTONS -->
-                <div class="form-footer-btn">
-
-                    <button
-                        type="button"
-                        class="auth-btn"
-                        (click)="login()">
-
-                        🔐 Authenticate
-                    </button>
-
-                    <!-- <button
-                        type="button"
-                        class="load-btn"
-                        (click)="getFiles()">
-
-                        📁 Load OneDrive Files
-                    </button> -->
-
-                </div>
-
-            </form>
-
-        </div>
-
+      @if (!drives.length) {
+        <p class="lede muted">Nothing connected yet.</p>
+      } @else {
+        <ul class="sheet-list">
+          @for (d of drives; track d.accountId) {
+            <li class="sheet-row">
+              <div class="sheet-main">
+                <span class="sheet-title">{{ d.email }}</span>
+                <span class="sheet-meta">
+                  <span class="tag">{{ d.department }}</span>
+                  @if (d.active) { <span class="tag tag-soft">active</span> }
+                </span>
+              </div>
+              <div class="sheet-actions">
+                <button class="btn-ghost" type="button" (click)="sync(d.department)" [disabled]="busy">
+                  <mat-icon>refresh</mat-icon>Sync
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
     </div>
-
-    <!--  LOADING -->
-    <div class="loading-box" *ngIf="loading">
-
-        <div class="spinner-border text-primary"></div>
-
-        <p>Loading...</p>
-
-    </div>
-
-    <!--  FILES  -->
-    @if(files.length > 0) {
-
-    <div class="form-wrapper">
-
-        <div class="file-card">
-
-            <h4 class="file-title">
-                📂 Files
-            </h4>
-
-            <!-- @for(file of metadata; track file) { -->
-
-            <div class="file-item">
-
-                <div class="file-name">
-                    {{ metadata.fileName }}
-                </div>
-
-                <div class="file-actions">
-
-                    <button
-                        class="sync-btn"
-                        (click)="syncData(metadata)">
-
-                        Sync
-                    </button>
-
-                    <button
-                        class="open-btn"
-                        (click)="downloadFile(metadata)">
-
-                        Open Excel
-                    </button>
-
-                </div>
-
-            </div>
-
-            <!-- } -->
-
-        </div>
-
-    </div>
-
-    }
+  }
 
 </div>
-
-
-

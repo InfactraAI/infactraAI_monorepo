@@ -32,6 +32,7 @@ export class TopNavbar implements OnInit {
   logoUrl: string = 'assets/images/jayanitha.png';
   companyName: string = '';
   name: string = localStorage.getItem('username') || '';
+  orgName: string = localStorage.getItem('orgName') || '';
 
   constructor(
     private router: Router,
@@ -59,11 +60,14 @@ export class TopNavbar implements OnInit {
         } else if (
           url.startsWith('/configuration') ||
           url.startsWith('/tally-config') ||
-          url.startsWith('/one-drive-config')
+          url.startsWith('/one-drive-config') ||
+          url.startsWith('/google-sheets-config')
         ) {
           this.activeNav = 'configuration';
         } else if (url.startsWith('/ask-fireai')) {
           this.activeNav = 'ask-ai';
+        } else if (url.startsWith('/team')) {
+          this.activeNav = 'team';
         }
       });
 
@@ -81,7 +85,8 @@ export class TopNavbar implements OnInit {
     return (
       this.router.url.startsWith('/configuration') ||
       this.router.url.startsWith('/tally-config') ||
-      this.router.url.startsWith('/one-drive-config')
+      this.router.url.startsWith('/one-drive-config') ||
+      this.router.url.startsWith('/google-sheets-config')
     );
   }
 
@@ -94,6 +99,7 @@ export class TopNavbar implements OnInit {
   }
 
   logout(): void {
+    localStorage.clear();
     this.router.navigate(['/login']);
   }
 

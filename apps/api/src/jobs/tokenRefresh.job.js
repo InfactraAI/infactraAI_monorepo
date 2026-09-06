@@ -10,28 +10,28 @@ cron.schedule('*/5 * * * *', async () => {
   isRefreshing = true;
 
   try {
-    const users = await UserToken.find({});
+    const connections = await UserToken.find({});
     const now = Date.now();
 
-    for (const user of users) {
-      let updated = false;
+    for (const conn of connections) {
+      let dirty = false;
 
-      for (const drive of user.oneDrives) {
+      for (const drive of conn.oneDrives) {
         if (!drive.refreshToken) continue;
-        if (new Date(drive.expiry).getTime() - now >= BUFFER_MS) continue;
+        if (drive.expiry && new Date(drive.expiry).getTime() - now >= BUFFER_MS) continue;
 
         try {
-          const refreshed = await refreshAccessToken(user.userId, drive.accountId);
-          drive.accessToken = refreshed.accessToken;
-          drive.expiry = refreshed.expiry;
-          updated = true;
+          await refreshAccessToken(conn, drive);
         } catch (err) {
-          console.error(`[tokenRefresh] Failed for ${drive.email}: ${err.message}`);
-          drive.accessToken = null;
+          console.error(`[tokenRefresh] org ${conn.orgId} / ${drive.email}: ${err.message}`);
+          drive.accessToken = undefined;
         }
+        // Either way the subdocument changed and must be persisted — the
+        // previous version only saved on success, so invalidations were lost.
+        dirty = true;
       }
 
-      if (updated) await user.save();
+      if (dirty) await conn.save();
     }
   } catch (err) {
     console.error('[tokenRefresh] Cron error:', err.message);

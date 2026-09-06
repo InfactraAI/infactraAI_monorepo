@@ -1,24 +1,64 @@
 {
   "info": {
     "name": "Infactra API",
-    "description": "Complete API collection for the Infactra platform.\n\nSet the `base_url` variable to `http://localhost:3000` for dev or `http://localhost` for prod.\nAfter login, the `token` variable is automatically set on the Login request's Tests tab.",
+    "description": "Multi-tenant Infactra API.\n\nEvery request except those marked Public needs `Authorization: Bearer {{token}}`.\nThe organisation is read from the token \u2014 never pass an orgId or userId.\n\nStart with Auth \u2192 Login; it stores the JWT in {{token}} automatically.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "base_url", "value": "http://localhost:3000", "type": "string" },
-    { "key": "token",    "value": "",                      "type": "string" },
-    { "key": "userId",   "value": "",                      "type": "string" }
+    {
+      "key": "base_url",
+      "value": "http://localhost",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "invite_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "member_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "invite_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sheet_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "spreadsheet_id",
+      "value": "",
+      "type": "string"
+    }
   ],
   "item": [
     {
       "name": "Health",
       "item": [
         {
-          "name": "Health check",
+          "name": "Health",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{base_url}}/health", "host": ["{{base_url}}"], "path": ["health"] },
-            "description": "Returns `{ status: 'ok' }` when the server is up."
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
           }
         }
       ]
@@ -28,118 +68,747 @@
       "item": [
         {
           "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@acme.test\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "description": "Returns a JWT carrying orgId. Saved to {{token}} by the test script."
+          },
           "event": [
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "const res = pm.response.json();",
-                  "if (res.token) {",
-                  "  pm.collectionVariables.set('token', res.token);",
-                  "}",
-                  "if (res.user && res.user._id) {",
-                  "  pm.collectionVariables.set('userId', res.user._id);",
-                  "}",
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Token present', () => pm.expect(res.token).to.be.a('string'));"
-                ],
-                "type": "text/javascript"
+                  "const d = pm.response.json();",
+                  "if (d.token) {",
+                  "  pm.collectionVariables.set('token', d.token);",
+                  "  console.log('Signed in to', d.organization && d.organization.name);",
+                  "}"
+                ]
               }
             }
-          ],
+          ]
+        },
+        {
+          "name": "Register (creates an organisation)",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth","login"] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@infactra.ai\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"name\": \"Ann Admin\",\n  \"organizationName\": \"Acme Exports Pvt Ltd\",\n  \"email\": \"ann@acme.test\",\n  \"password\": \"pw12345678\",\n  \"mobile\": \"9000000001\",\n  \"address\": \"HQ, Mumbai\"\n}"
             },
-            "description": "Returns a JWT. The Tests tab automatically saves it to the `token` collection variable."
+            "description": "Public. Creates a NEW organisation; the registrant becomes its owner and ADMIN. To join an existing organisation use an invitation instead."
           }
         },
         {
-          "name": "Register",
+          "name": "Forgot password",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth","register"] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/forgotPassword",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "forgotPassword"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Demo Admin\",\n  \"email\": \"admin@infactra.ai\",\n  \"password\": \"password123\",\n  \"unitName\": \"Infactra HQ\",\n  \"mobile\": \"9999999999\",\n  \"address\": \"123 Main Street\"\n}"
-            },
-            "description": "Creates a new ADMIN user and sends a welcome email."
+              "raw": "{\n  \"email\": \"admin@acme.test\"\n}"
+            }
           }
         },
         {
-          "name": "Forgot Password",
+          "name": "Reset password",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/auth/forgotPassword", "host": ["{{base_url}}"], "path": ["auth","forgotPassword"] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/resetPassword",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "resetPassword"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@infactra.ai\"\n}"
-            },
-            "description": "Sends a password reset link to the registered email. Link expires in 15 minutes."
-          }
-        },
-        {
-          "name": "Reset Password",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/auth/resetPassword", "host": ["{{base_url}}"], "path": ["auth","resetPassword"] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"token\": \"<reset-token-from-email>\",\n  \"password\": \"newPassword123\"\n}"
-            },
-            "description": "Resets the password using the token from the reset email."
+              "raw": "{\n  \"token\": \"FROM_EMAIL_LINK\",\n  \"password\": \"newpw12345678\"\n}"
+            }
           }
         }
       ]
     },
     {
-      "name": "Company",
+      "name": "Organisation & team",
       "item": [
         {
-          "name": "Get Company Profile",
+          "name": "List members and invitations",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{base_url}}/company/profile", "host": ["{{base_url}}"], "path": ["company","profile"] },
-            "description": "Returns the company name and logo URL. Creates a default record if none exists."
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/org/members",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "org",
+                "members"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Any member may read. canManage reports whether the caller is an ADMIN."
           }
         },
         {
-          "name": "Update Company",
+          "name": "Invite a member",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/company/update", "host": ["{{base_url}}"], "path": ["company","update"] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/org/invites",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "org",
+                "invites"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Infactra Technologies Pvt Ltd\",\n  \"logo\": \"http://localhost:3000/uploads/logo.png\"\n}"
+              "raw": "{\n  \"email\": \"newhire@acme.test\",\n  \"role\": \"USER\"\n}"
             },
-            "description": "Updates the company name and/or logo URL."
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "ADMIN only. If SMTP is unconfigured the response carries inviteLink for manual sharing."
           }
         },
         {
-          "name": "Upload Logo",
+          "name": "Resend invitation",
           "request": {
             "method": "POST",
-            "url": { "raw": "{{base_url}}/company/upload-logo", "host": ["{{base_url}}"], "path": ["company","upload-logo"] },
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/org/invites/{{invite_id}}/resend",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "org",
+                "invites",
+                "{{invite_id}}",
+                "resend"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "ADMIN only. Issues a fresh token; the previous link stops working."
+          }
+        },
+        {
+          "name": "Revoke invitation",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/org/invites/{{invite_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "org",
+                "invites",
+                "{{invite_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "ADMIN only."
+          }
+        },
+        {
+          "name": "Change a member's role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/org/members/{{member_id}}/role",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "org",
+                "members",
+                "{{member_id}}",
+                "role"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"ADMIN\"\n}"
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "ADMIN only. The owner's role cannot be changed, and the last admin cannot be demoted."
+          }
+        },
+        {
+          "name": "Remove a member",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/org/members/{{member_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "org",
+                "members",
+                "{{member_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "ADMIN only. The owner cannot be removed, and you cannot remove yourself."
+          }
+        },
+        {
+          "name": "Look up an invitation (public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/org/invites/lookup?token={{invite_token}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "org",
+                "invites",
+                "lookup"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{invite_token}}"
+                }
+              ]
+            },
+            "description": "Public. Lets the accept page show the organisation before sign-up."
+          }
+        },
+        {
+          "name": "Accept an invitation (public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/org/invites/accept",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "org",
+                "invites",
+                "accept"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{invite_token}}\",\n  \"name\": \"New Hire\",\n  \"password\": \"pw12345678\"\n}"
+            },
+            "description": "Public. Single-use. Returns a JWT so the invitee lands signed in."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Company profile",
+      "item": [
+        {
+          "name": "Get organisation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/company/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "company",
+                "profile"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update organisation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/company/update",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "company",
+                "update"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Exports Pvt Ltd\",\n  \"logo\": \"http://localhost/uploads/logo.png\"\n}"
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload logo",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [],
             "body": {
               "mode": "formdata",
               "formdata": [
                 {
                   "key": "logo",
                   "type": "file",
-                  "src": "",
-                  "description": "Select a PNG/JPG file from your machine"
+                  "src": []
                 }
               ]
             },
-            "description": "Uploads a logo file. Returns the public URL saved in the company record."
+            "url": {
+              "raw": "{{base_url}}/company/upload-logo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "company",
+                "upload-logo"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Google Sheets",
+      "item": [
+        {
+          "name": "Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/google/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "google",
+                "status"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "configured = server has GOOGLE_* env. connected = this org has linked an account."
+          }
+        },
+        {
+          "name": "Get consent URL",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/google/auth-url",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "google",
+                "auth-url"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Returns { url }. The browser navigates there; identity rides in a signed state token."
+          }
+        },
+        {
+          "name": "OAuth callback (public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/google/callback?code=AUTH_CODE&state=SIGNED_STATE",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "google",
+                "callback"
+              ],
+              "query": [
+                {
+                  "key": "code",
+                  "value": "AUTH_CODE"
+                },
+                {
+                  "key": "state",
+                  "value": "SIGNED_STATE"
+                }
+              ]
+            },
+            "description": "Public. Google redirects the browser here; not called by hand."
+          }
+        },
+        {
+          "name": "Picker config",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/google/picker-config",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "google",
+                "picker-config"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Short-lived access token plus the public client ID / API key / project number the Picker needs."
+          }
+        },
+        {
+          "name": "List worksheet tabs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/google/spreadsheets/{{spreadsheet_id}}/tabs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "google",
+                "spreadsheets",
+                "{{spreadsheet_id}}",
+                "tabs"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Import a sheet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/google/sheets",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "google",
+                "sheets"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"spreadsheetId\": \"{{spreadsheet_id}}\",\n  \"department\": \"inventory\",\n  \"sheetName\": \"Sheet1\"\n}"
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Replaces whatever dataset the department currently holds."
+          }
+        },
+        {
+          "name": "Re-sync a sheet",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/google/sheets/{{sheet_id}}/sync",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "google",
+                "sheets",
+                "{{sheet_id}}",
+                "sync"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Remove a sheet",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/google/sheets/{{sheet_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "google",
+                "sheets",
+                "{{sheet_id}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Stops syncing and clears that department's data."
+          }
+        },
+        {
+          "name": "Disconnect Google",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/google/disconnect",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "google",
+                "disconnect"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Revokes the token with Google and forgets the account."
           }
         }
       ]
@@ -148,93 +817,193 @@
       "name": "OneDrive",
       "item": [
         {
-          "name": "Initiate OAuth Login",
+          "name": "Get consent URL",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/onedrive/login?clientId=YOUR_CLIENT_ID&clientSecret=YOUR_SECRET&redirectUri=http://localhost:3000/onedrive/callback&department=inventory&userId={{userId}}",
-              "host": ["{{base_url}}"],
-              "path": ["onedrive","login"],
+              "raw": "{{base_url}}/onedrive/login?department=inventory",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "onedrive",
+                "login"
+              ],
               "query": [
-                { "key": "clientId",     "value": "YOUR_CLIENT_ID" },
-                { "key": "clientSecret", "value": "YOUR_SECRET" },
-                { "key": "redirectUri",  "value": "http://localhost:3000/onedrive/callback" },
-                { "key": "department",   "value": "inventory" },
-                { "key": "userId",       "value": "{{userId}}" }
+                {
+                  "key": "department",
+                  "value": "inventory"
+                }
               ]
             },
-            "description": "Redirects the browser to the Microsoft login page. Open in browser, not via Postman Send button.\n\nThe `department` value must match the folder name on the connected OneDrive (e.g. `inventory`, `hr`)."
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Returns { url }. Azure app credentials are server-side env \u2014 no secret in this request."
           }
         },
         {
-          "name": "OAuth Callback (reference)",
+          "name": "OAuth callback (public)",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/onedrive/callback?code=AUTH_CODE&state=BASE64_STATE",
-              "host": ["{{base_url}}"],
-              "path": ["onedrive","callback"],
+              "raw": "{{base_url}}/onedrive/callback?code=AUTH_CODE&state=SIGNED_STATE",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "onedrive",
+                "callback"
+              ],
               "query": [
-                { "key": "code",  "value": "AUTH_CODE",    "description": "Provided by Microsoft after user consent" },
-                { "key": "state", "value": "BASE64_STATE", "description": "Base64-encoded JSON set by /onedrive/login" }
+                {
+                  "key": "code",
+                  "value": "AUTH_CODE"
+                },
+                {
+                  "key": "state",
+                  "value": "SIGNED_STATE"
+                }
               ]
-            },
-            "description": "Microsoft redirects here after the user authorises. Do not call manually — this is for reference only."
+            }
           }
         },
         {
-          "name": "List Connected Drives",
+          "name": "Connected accounts",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/onedrive/getOneDrives?userId={{userId}}",
-              "host": ["{{base_url}}"],
-              "path": ["onedrive","getOneDrives"],
-              "query": [{ "key": "userId", "value": "{{userId}}" }]
+              "raw": "{{base_url}}/onedrive/getOneDrives",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "onedrive",
+                "getOneDrives"
+              ]
             },
-            "description": "Returns all OneDrive accounts connected for a user, with department, expiry, and connection status."
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
           }
         },
         {
           "name": "Sync Excel from OneDrive",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/onedrive/files?userId={{userId}}&department=inventory",
-              "host": ["{{base_url}}"],
-              "path": ["onedrive","files"],
+              "raw": "{{base_url}}/onedrive/files?department=inventory",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "onedrive",
+                "files"
+              ],
               "query": [
-                { "key": "userId",     "value": "{{userId}}" },
-                { "key": "department", "value": "inventory", "description": "inventory | hr | any folder name on OneDrive" }
+                {
+                  "key": "department",
+                  "value": "inventory"
+                }
               ]
             },
-            "description": "Downloads the Excel file from the OneDrive folder matching `department`, parses it, and saves the result to MongoDB. Returns the processed data."
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Finds a Drive folder named after the department and imports the first workbook inside."
           }
         },
         {
-          "name": "Get Cached Excel Data",
+          "name": "Read imported rows",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{base_url}}/onedrive/getExcelInventoryHrData?department=inventory",
-              "host": ["{{base_url}}"],
-              "path": ["onedrive","getExcelInventoryHrData"],
-              "query": [{ "key": "department", "value": "inventory" }]
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "onedrive",
+                "getExcelInventoryHrData"
+              ],
+              "query": [
+                {
+                  "key": "department",
+                  "value": "inventory"
+                }
+              ]
             },
-            "description": "Reads previously synced data from MongoDB. No Graph API call is made. Use this for the Inventory and HR tables in the UI."
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Reads FileData for the caller's organisation. Serves data imported from any source."
           }
         },
         {
-          "name": "Download File",
+          "name": "Download a file",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/onedrive/download/:id",
-              "host": ["{{base_url}}"],
-              "path": ["onedrive","download",":id"],
-              "variable": [{ "key": "id", "value": "ONEDRIVE_FILE_ID" }]
+              "raw": "{{base_url}}/onedrive/download/:id?accountId=ACCOUNT_ID",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "onedrive",
+                "download",
+                ":id"
+              ],
+              "query": [
+                {
+                  "key": "accountId",
+                  "value": "ACCOUNT_ID"
+                }
+              ]
             },
-            "description": "Streams a file from OneDrive to the client. Requires a valid access token for the user."
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
           }
         }
       ]
@@ -243,16 +1012,39 @@
       "name": "Tally",
       "item": [
         {
-          "name": "Connect to Tally",
+          "name": "Test connection",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/tally/connect", "host": ["{{base_url}}"], "path": ["tally","connect"] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tally/connect",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tally",
+                "connect"
+              ]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"host\": \"localhost\",\n  \"port\": 9000\n}"
             },
-            "description": "Sends an XML request to the Tally ERP instance and returns a parsed JSON response.\n\nTally must be running on the specified host and port with the HTTP XML server enabled."
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
           }
         }
       ]

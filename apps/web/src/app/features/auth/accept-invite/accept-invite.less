@@ -1,0 +1,101 @@
+@ink: #111827;
+@muted: #6b7280;
+@faint: #9ca3af;
+@rule: #e5e7eb;
+@brand: #0f9d58;
+@brand-dk: #0b8043;
+@danger: #dc2626;
+
+.invite-screen {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px;
+  background: #fcfcfc;
+  color: @ink;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-y: auto;
+}
+
+.invite-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 36px 32px 30px;
+  border: 1px solid @rule;
+  border-radius: 14px;
+  background: #fff;
+  text-align: center;
+
+  h1 { margin: 0 0 8px; font-size: 22px; font-weight: 700; letter-spacing: -0.015em; }
+  .status { margin: 0 0 24px; color: @muted; font-size: 14px; line-height: 1.6; }
+  .status strong { color: @ink; }
+}
+
+.state-icon {
+  width: 44px; height: 44px; font-size: 44px;
+  margin-bottom: 14px;
+  &.good { color: @brand; }
+  &.bad  { color: @danger; }
+}
+
+.field {
+  margin-bottom: 14px;
+  text-align: left;
+
+  label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: @muted;
+  }
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 13px;
+    border: 1px solid @rule;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    color: @ink;
+    &::placeholder { color: @faint; }
+    &:focus { outline: 2px solid @brand; outline-offset: -1px; border-color: @brand; }
+    &:disabled { opacity: .6; }
+  }
+}
+
+.reveal, .link {
+  border: none;
+  background: none;
+  padding: 0;
+  color: @brand-dk;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  &:hover { text-decoration: underline; }
+}
+
+.link { font-size: 13px; }
+
+.btn-primary {
+  padding: 11px 20px;
+  border: none;
+  border-radius: 8px;
+  background: @brand;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  &.full { width: 100%; margin-top: 6px; }
+  &:hover:not(:disabled) { background: @brand-dk; }
+  &:disabled { opacity: .5; cursor: not-allowed; }
+}
+
+.fineprint { margin: 18px 0 0; color: @faint; font-size: 13px; }
+
+button:focus-visible, input:focus-visible { outline: 2px solid @brand; outline-offset: 2px; }

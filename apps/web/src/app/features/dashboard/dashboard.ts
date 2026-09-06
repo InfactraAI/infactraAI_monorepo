@@ -159,11 +159,10 @@ export class AdminDashboard implements OnInit {
     }
   };
 
-  userId = localStorage.getItem('userId') || '';
   constructor(private onedriveService: OneDriveService) {}
 
   ngOnInit() {
-    this.onedriveService.getOneDrives(this.userId).subscribe({
+    this.onedriveService.getOneDrives().subscribe({
       next: (res) => {
         res.oneDrives.forEach((drive: any) => {
           if (drive.department === 'inventory') localStorage.setItem('activeInventoryDrive', drive.accountId);

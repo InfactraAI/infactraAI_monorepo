@@ -13,9 +13,13 @@ const oneDriveSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Connections belong to the organisation, not the individual who authorised
+// them, so a teammate can sync data a colleague connected. userId records who
+// that was.
 const userTokenSchema = new mongoose.Schema(
   {
-    userId:    { type: String, required: true, unique: true, index: true },
+    orgId:     { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', required: true, unique: true, index: true },
+    userId:    { type: String },
     oneDrives: [oneDriveSchema],
   },
   { timestamps: true }

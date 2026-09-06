@@ -28,7 +28,7 @@ export class login implements OnInit {
 
   // FORM FIELDS
   name = '';
-  unitName = '';
+  organizationName = '';
   contactPerson = '';
   email = '';
   address = '';
@@ -70,6 +70,7 @@ export class login implements OnInit {
     this.mode = mode;
     this.error = '';
     this.name = '';
+    this.organizationName = '';
     this.email = '';
     this.address = '';
     this.mobile = '';
@@ -84,7 +85,7 @@ export class login implements OnInit {
         localStorage.setItem('role', res.user.role);
         localStorage.setItem('username', res.user.name);
         localStorage.setItem('email', res.user.email);
-        localStorage.setItem('userId', res.user._id);
+        localStorage.setItem('orgName', res.organization?.name ?? '');
         this.router.navigate(['/dashboard']);
       },
       error: err => {
@@ -103,8 +104,14 @@ export class login implements OnInit {
       return;
     }
 
+    if (!this.organizationName.trim()) {
+      this.snack.open('Organisation name is required.', 'Close', { duration: 3000 });
+      return;
+    }
+
     const payload = {
       name: this.name,
+      organizationName: this.organizationName,
       mobile: this.mobile,
       email: this.email,
       address: this.address,
@@ -113,7 +120,7 @@ export class login implements OnInit {
 
     this.loginService.register(payload).subscribe({
       next: () => {
-        this.snack.open('Registration successful. Please login.', 'Close', { duration: 3000, panelClass: ['success-snackbar'] });
+        this.snack.open('Organisation created. Please sign in.', 'Close', { duration: 3000, panelClass: ['success-snackbar'] });
         this.toggleMode('login');
       },
       error: err => {

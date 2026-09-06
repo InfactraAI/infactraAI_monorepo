@@ -20,7 +20,6 @@ import { OneDriveService } from '../../core/services/onedrive.service';
 })
 export class HrAiComponent implements OnInit {
   selectedDate: string = '';
-  userId: string = localStorage.getItem('userId') || '';
 
   constructor(private onedriveService: OneDriveService) { }
 
@@ -42,7 +41,7 @@ export class HrAiComponent implements OnInit {
   }
 
   getHrFiles() {
-    this.onedriveService.getFiles(this.userId, 'hr').subscribe({
+    this.onedriveService.getFiles('hr').subscribe({
       next: (res) => {
         this.loadExcelData();
         console.log("📁 HR OneDrive Files:", res);

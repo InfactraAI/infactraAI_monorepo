@@ -1,137 +1,116 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import * as XLSX from 'xlsx';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { OneDriveService } from '../../core/services/onedrive.service';
 
+const DEPARTMENTS = [
+  { key: 'inventory', label: 'Inventory', feeds: 'the Inventory table' },
+  { key: 'hr', label: 'HR', feeds: 'the HR screens' },
+];
+
+/**
+ * The Azure app is platform config now, so this screen no longer asks anyone
+ * for a client ID or secret — it picks a department and hands off to Microsoft.
+ */
 @Component({
   selector: 'app-one-drive-config',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './onedrive-config.html',
-  styleUrl: './onedrive-config.less'
+  styleUrl: './onedrive-config.less',
 })
 export class OneDriveConfigComponent implements OnInit {
+  departments = DEPARTMENTS;
+  selectedDepartment = 'inventory';
 
-  configForm!: FormGroup;
-  files: any[] = [];
-  isConnected: boolean = false;
-  loading: boolean = false;
-  metadata: any = null;
-  userId: string = localStorage.getItem('userId') || '';
+  loading = true;
+  busy = false;
+  drives: any[] = [];
 
   constructor(
-    private fb: FormBuilder,
     private oneDriveService: OneDriveService,
-    private location: Location
-  ) { }
+    private route: ActivatedRoute,
+    private router: Router,
+    private location: Location,
+    private snack: MatSnackBar
+  ) {}
+
+  ngOnInit(): void {
+    this.readReturnParams();
+    this.refresh();
+  }
 
   goBack(): void {
     this.location.back();
   }
 
-  ngOnInit(): void {
-    this.configForm = this.fb.group({
-      redirectUri:  ['', Validators.required],
-      clientId:     ['', Validators.required],
-      tenantId:     [{ value: 'common', disabled: true }],
-      clientSecret: ['', Validators.required],
-      department:   ['', Validators.required],
+  private readReturnParams(): void {
+    const params = this.route.snapshot.queryParams;
+    if (!params['onedrive']) return;
+
+    if (params['onedrive'] === 'connected') {
+      this.toast(`Connected as ${params['email'] || 'your Microsoft account'}`, 'success');
+    } else {
+      this.toast(params['reason'] || 'Could not connect to OneDrive.', 'error');
+    }
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
+  }
+
+  refresh(): void {
+    this.loading = true;
+    this.oneDriveService.getOneDrives().subscribe({
+      next: (res) => {
+        this.drives = res.oneDrives || [];
+        this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.toast(this.messageFrom(err), 'error');
+      },
     });
-    this.isConnected = false;
   }
 
-  login(): void {
-    this.oneDriveService.login(this.configForm.getRawValue(), this.userId);
+  connect(): void {
+    this.busy = true;
+    this.oneDriveService.authUrl(this.selectedDepartment).subscribe({
+      next: ({ url }) => { window.location.href = url; },
+      error: (err) => {
+        this.busy = false;
+        this.toast(this.messageFrom(err), 'error');
+      },
+    });
   }
 
-  testConnection(): void {
-    if (this.configForm.invalid) {
-      alert("Please fill all required fields");
-      return;
-    }
-    this.loading = true;
-    this.oneDriveService.testConnection(this.configForm.value)
-      .subscribe({
-        next: () => {
-          this.isConnected = true;
-          this.loading = false;
-          alert("Connection Successful");
-        },
-        error: (err) => {
-          console.error(err);
-          this.loading = false;
-          alert("Connection Failed");
-        }
-      });
+  sync(department: string): void {
+    this.busy = true;
+    this.oneDriveService.getFiles(department).subscribe({
+      next: (res) => {
+        this.busy = false;
+        this.toast(`Imported ${res.totalRows} rows from ${res.fileName}`, 'success');
+      },
+      error: (err) => {
+        this.busy = false;
+        this.toast(this.messageFrom(err), 'error');
+      },
+    });
   }
 
-  testAndSave(): void {
-    if (this.configForm.invalid) {
-      alert("Form is invalid");
-      return;
-    }
-    this.loading = true;
-    this.oneDriveService.saveConnection(this.configForm.value)
-      .subscribe({
-        next: () => {
-          this.isConnected = true;
-          this.loading = false;
-          alert("Configuration Saved Successfully");
-        },
-        error: (err) => {
-          console.error(err);
-          this.loading = false;
-          alert("Save Failed");
-        }
-      });
+  driveFor(department: string) {
+    return this.drives.find((d) => d.department === department);
   }
 
-  getFiles(): void {
-    this.loading = true;
-    // Commented out — same as original
+  private messageFrom(err: any): string {
+    return err?.error?.message || err?.message || 'Something went wrong.';
   }
 
-  syncData(file: any): void {
-    const tableName = prompt("Enter table name");
-    if (!tableName || tableName.trim() === "") {
-      alert("Table name required");
-      return;
-    }
-    this.loading = true;
-    this.oneDriveService.syncData(file.id, tableName.trim())
-      .subscribe({
-        next: () => {
-          this.loading = false;
-          alert("File Synced Successfully");
-        },
-        error: () => {
-          this.loading = false;
-          alert("Sync Failed");
-        }
-      });
-  }
-
-  downloadFile(file: any): void {
-    this.oneDriveService.downloadFile(file.id)
-      .subscribe({
-        next: (blob: Blob) => {
-          const reader = new FileReader();
-          reader.onload = (e: any) => {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet);
-            console.log("📊 Excel Data from OneDrive:", jsonData);
-          };
-          reader.readAsArrayBuffer(blob);
-        },
-        error: (err) => {
-          console.error("❌ Download Error:", err);
-        }
-      });
+  private toast(message: string, kind: 'success' | 'error'): void {
+    this.snack.open(message, 'Close', {
+      duration: 4000,
+      panelClass: [kind === 'success' ? 'success-snackbar' : 'error-snackbar'],
+    });
   }
 }

@@ -1,0 +1,53 @@
+<div class="invite-screen">
+  <div class="invite-card">
+
+    @if (loading) {
+      <p class="status">Checking your invitation…</p>
+    } @else if (error) {
+      <mat-icon class="state-icon bad">link_off</mat-icon>
+      <h1>Invitation unavailable</h1>
+      <p class="status">{{ error }}</p>
+      <button class="btn-primary" type="button" (click)="goToLogin()">Go to sign in</button>
+    } @else if (invite) {
+
+      <mat-icon class="state-icon good">mark_email_read</mat-icon>
+
+      <h1>Join {{ invite.organizationName }}</h1>
+      <p class="status">
+        You've been invited as
+        <strong>{{ invite.role === 'ADMIN' ? 'an admin' : 'a member' }}</strong>.
+        Set a password to finish setting up <strong>{{ invite.email }}</strong>.
+      </p>
+
+      <div class="field">
+        <label for="inv-name">Your name</label>
+        <input id="inv-name" type="text" [(ngModel)]="name" placeholder="Jane Doe" [disabled]="busy" />
+      </div>
+
+      <div class="field">
+        <label for="inv-pass">
+          Password
+          <button type="button" class="reveal" (click)="hidePassword = !hidePassword">
+            {{ hidePassword ? 'Show' : 'Hide' }}
+          </button>
+        </label>
+        <input id="inv-pass" [type]="hidePassword ? 'password' : 'text'"
+               [(ngModel)]="password" placeholder="At least 8 characters" [disabled]="busy" />
+      </div>
+
+      <div class="field">
+        <label for="inv-confirm">Confirm password</label>
+        <input id="inv-confirm" [type]="hidePassword ? 'password' : 'text'"
+               [(ngModel)]="confirmPassword" (keyup.enter)="accept()" [disabled]="busy" />
+      </div>
+
+      <button class="btn-primary full" type="button" (click)="accept()"
+              [disabled]="busy || !name.trim() || !password">
+        {{ busy ? 'Setting up…' : 'Accept invitation' }}
+      </button>
+
+      <p class="fineprint">Already have an account? <button type="button" class="link" (click)="goToLogin()">Sign in</button></p>
+    }
+
+  </div>
+</div>

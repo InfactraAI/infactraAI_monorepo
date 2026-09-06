@@ -16,8 +16,13 @@ export class AuthService {
   saveSession(res: any) {
     localStorage.setItem('token', res.token);
     localStorage.setItem('role', res.user.role);
-    localStorage.setItem('userId', res.user._id);
     localStorage.setItem('username', res.user.name);
+    // Display only — the server reads the real orgId from the JWT.
+    localStorage.setItem('orgName', res.organization?.name ?? '');
+  }
+
+  get orgName() {
+    return localStorage.getItem('orgName');
   }
 
   logout() {

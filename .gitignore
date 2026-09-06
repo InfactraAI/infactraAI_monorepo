@@ -40,3 +40,4 @@ desktop.ini
 # ── Docker ───────────────────────────────────────────────────────────────────
 # Ignore override files with local secrets
 docker-compose.override.yml
+apps/api/.env.backup-*

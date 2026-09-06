@@ -1,12 +1,24 @@
-const XLSX = require('xlsx');
-const fs = require('fs');
-const Company = require('../../models/Company');
+const Organization = require('../../models/Organization');
 
-exports.getCompany = async (_req, res, next) => {
+/**
+ * Company endpoints now read and write the caller's own Organization, rather
+ * than a single global row shared by the whole install. Route paths are
+ * unchanged so the frontend's LogoService keeps working.
+ */
+
+const publicOrg = (org) => ({
+  _id: org._id,
+  name: org.name,
+  logo: org.logo,
+  createdAt: org.createdAt,
+  updatedAt: org.updatedAt,
+});
+
+exports.getCompany = async (req, res, next) => {
   try {
-    let company = await Company.findOne();
-    if (!company) company = await Company.create({ name: 'Demo Company' });
-    res.json(company);
+    const org = await Organization.findById(req.orgId);
+    if (!org) return res.status(404).json({ message: 'Organisation not found' });
+    res.json(publicOrg(org));
   } catch (err) {
     next(err);
   }
@@ -15,15 +27,15 @@ exports.getCompany = async (_req, res, next) => {
 exports.updateCompany = async (req, res, next) => {
   try {
     const { name, logo } = req.body;
-    let company = await Company.findOne();
-    if (!company) {
-      company = await Company.create({ name, logo });
-    } else {
-      if (name) company.name = name;
-      if (logo) company.logo = logo;
-      await company.save();
-    }
-    res.json({ message: 'Company updated', company });
+
+    const update = {};
+    if (name) update.name = name;
+    if (logo !== undefined) update.logo = logo;
+
+    const org = await Organization.findByIdAndUpdate(req.orgId, { $set: update }, { returnDocument: 'after' });
+    if (!org) return res.status(404).json({ message: 'Organisation not found' });
+
+    res.json({ message: 'Organisation updated', company: publicOrg(org) });
   } catch (err) {
     next(err);
   }
@@ -31,37 +43,20 @@ exports.updateCompany = async (req, res, next) => {
 
 exports.uploadLogo = async (req, res, next) => {
   try {
-    // Build URL from env so it works in any environment
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+
     const base = process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
     const fileUrl = `${base}/uploads/${req.file.filename}`;
 
-    let company = await Company.findOne();
-    if (!company) {
-      company = await Company.create({ logo: fileUrl });
-    } else {
-      company.logo = fileUrl;
-      await company.save();
-    }
+    const org = await Organization.findByIdAndUpdate(
+      req.orgId,
+      { $set: { logo: fileUrl } },
+      { returnDocument: 'after' }
+    );
+    if (!org) return res.status(404).json({ message: 'Organisation not found' });
+
     res.json({ message: 'Logo uploaded', logo: fileUrl });
   } catch (err) {
-    next(err);
-  }
-};
-
-exports.uploadExcelData = async (req, res, next) => {
-  try {
-    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-
-    const workbook = XLSX.readFile(req.file.path);
-    const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-    const formatted = data.map((item) => ({ name: item.name || 'Demo Company', logo: item.logo || '' }));
-
-    await Company.insertMany(formatted);
-    if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-
-    res.json({ message: 'Data imported', count: formatted.length });
-  } catch (err) {
-    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     next(err);
   }
 };

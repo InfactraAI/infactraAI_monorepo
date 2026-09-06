@@ -16,7 +16,6 @@ import { OneDriveService } from '../../core/services/onedrive.service';
 export class InventoryComponent implements OnInit {
   tableData: any[] = [];
   displayedColumns: string[] = [];
-  userId = localStorage.getItem('userId') || '';
 
   constructor(private onedriveService: OneDriveService) {}
 
@@ -30,7 +29,7 @@ export class InventoryComponent implements OnInit {
   }
 
   getInventoryFiles() {
-    this.onedriveService.getFiles(this.userId, 'inventory').subscribe({
+    this.onedriveService.getFiles('inventory').subscribe({
       next: () => this.loadExcelData(),
     });
   }

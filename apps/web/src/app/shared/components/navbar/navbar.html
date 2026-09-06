@@ -8,7 +8,7 @@
 
         <span class="v-divider"></span>
 
-        <span class="env">Demo environment</span>
+        <span class="env">{{ orgName || 'Demo environment' }}</span>
         <div><span class="status">
                 ●
             </span> <span class="status-text">
@@ -104,6 +104,16 @@
             <button class="nav-item nav-title" routerLink="/configuration" [class.active]="isConfigActive()">
                 <mat-icon>settings</mat-icon>
                 Configuration
+            </button>
+        </div>
+
+        <div class="nav-divider"></div>
+
+        <div class="nav-section">
+            <button class="nav-item nav-title" routerLink="/team" routerLinkActive="active"
+                [class.active]="activeNav === 'team'" (click)="setActive('team')">
+                <span class="nav-title-text">
+                    <mat-icon>groups</mat-icon>Team</span>
             </button>
         </div>
         

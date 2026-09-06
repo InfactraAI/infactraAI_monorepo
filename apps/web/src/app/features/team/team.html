@@ -1,0 +1,127 @@
+<div class="gs-screen">
+
+  <div class="gs-header">
+    <mat-icon class="gs-logo-icon">groups</mat-icon>
+    <div class="gs-title">
+      <h2>Team</h2>
+      <p>{{ data?.organization?.name || 'Your organisation' }}</p>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="gs-card gs-empty"><p>Loading your team…</p></div>
+  } @else if (data) {
+
+    @if (data.canManage) {
+      <div class="gs-card">
+        <h3>Invite someone</h3>
+        <p class="lede">
+          They'll get a link to set their own password and join
+          <strong>{{ data.organization.name }}</strong>. Invitations expire in 7 days.
+        </p>
+
+        <div class="invite-row">
+          <input class="text-input" type="email" placeholder="name@company.com"
+                 [(ngModel)]="inviteEmail" (keyup.enter)="invite()" [disabled]="busy" />
+
+          <select class="text-input role-select" [(ngModel)]="inviteRole" [disabled]="busy">
+            <option value="USER">Member</option>
+            <option value="ADMIN">Admin</option>
+          </select>
+
+          <button class="btn-primary" type="button" (click)="invite()" [disabled]="busy || !inviteEmail.trim()">
+            <mat-icon>send</mat-icon>{{ busy ? 'Working…' : 'Send invite' }}
+          </button>
+        </div>
+
+        @if (!data.emailEnabled) {
+          <p class="fineprint warn">
+            Email isn't configured on this server, so invitations won't send automatically —
+            you'll get a link to share instead.
+          </p>
+        }
+
+        @if (manualLink) {
+          <div class="manual-link">
+            <div>
+              <strong>Share this link with {{ manualLink.email }}</strong>
+              <code>{{ manualLink.url }}</code>
+            </div>
+            <button class="btn-ghost" type="button" (click)="copyLink()">
+              <mat-icon>content_copy</mat-icon>Copy
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="gs-card">
+      <h3>Members <span class="count">{{ data.members.length }}</span></h3>
+
+      <ul class="sheet-list">
+        @for (m of data.members; track m.id) {
+          <li class="sheet-row">
+            <div class="member-main">
+              <span class="avatar">{{ initials(m.name) }}</span>
+              <div class="sheet-main">
+                <span class="sheet-title">
+                  {{ m.name }}
+                  @if (m.isOwner) { <span class="tag tag-owner">Owner</span> }
+                  @else if (m.role === 'ADMIN') { <span class="tag">Admin</span> }
+                </span>
+                <span class="sheet-meta">{{ m.email }}</span>
+              </div>
+            </div>
+
+            @if (data.canManage && !m.isOwner) {
+              <div class="sheet-actions">
+                <button class="btn-ghost" type="button" (click)="toggleRole(m)" [disabled]="busy">
+                  {{ m.role === 'ADMIN' ? 'Make member' : 'Make admin' }}
+                </button>
+                <button class="btn-ghost danger" type="button" (click)="remove(m)" [disabled]="busy">
+                  <mat-icon>person_remove</mat-icon>
+                </button>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    </div>
+
+    @if (data.invitations.length) {
+      <div class="gs-card">
+        <h3>Pending invitations <span class="count">{{ data.invitations.length }}</span></h3>
+
+        <ul class="sheet-list">
+          @for (i of data.invitations; track i.id) {
+            <li class="sheet-row" [class.has-error]="i.expired">
+              <div class="sheet-main">
+                <span class="sheet-title">{{ i.email }}</span>
+                <span class="sheet-meta">
+                  <span class="tag tag-soft">{{ i.role === 'ADMIN' ? 'Admin' : 'Member' }}</span>
+                  @if (i.expired) {
+                    <span class="expired">Expired</span>
+                  } @else {
+                    <span>expires {{ i.expiresAt | date: 'd MMM' }}</span>
+                  }
+                </span>
+              </div>
+
+              @if (data.canManage) {
+                <div class="sheet-actions">
+                  <button class="btn-ghost" type="button" (click)="resend(i)" [disabled]="busy">
+                    <mat-icon>refresh</mat-icon>Resend
+                  </button>
+                  <button class="btn-ghost danger" type="button" (click)="revoke(i)" [disabled]="busy">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  }
+
+</div>

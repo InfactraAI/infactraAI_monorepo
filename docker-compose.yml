@@ -1,30 +1,39 @@
+# ── Production stack ─────────────────────────────────────────────────────────
+# Reads deployment settings from .env in this directory (see .env.prod.example).
+#   caddy :80/:443  automatic TLS, terminates HTTPS
+#     └── frontend  nginx: serves the built SPA, proxies API paths
+#           └── backend  Express
+#                 └── mongodb  internal only, authenticated, volume-backed
+#
+#   docker compose up -d --build
 services:
-  mongodb:
-    image: mongo:7
+  caddy:
+    image: caddy:2-alpine
     restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
     environment:
-      MONGO_INITDB_DATABASE: infactra_db
+      # Caddy obtains and renews a Let's Encrypt certificate for this name.
+      APP_DOMAIN: ${APP_DOMAIN:?set APP_DOMAIN in .env}
     volumes:
-      - mongo_data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data      # certificates — losing this re-issues them
+      - caddy_config:/config
+    depends_on:
+      - frontend
+    logging: &logging
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
 
-  mysql:
-    image: mysql:8
+  frontend:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
     restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
-      MYSQL_DATABASE: ${DB_NAME:-jayanitha}
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    depends_on:
+      - backend
+    logging: *logging
 
   backend:
     build:
@@ -33,30 +42,42 @@ services:
     restart: unless-stopped
     env_file: ./apps/api/.env
     environment:
-      MONGO_URI: mongodb://mongodb:27017/infactra_db
-      DB_HOST: mysql
-      FRONTEND_URL: http://localhost
-      API_BASE_URL: http://localhost
-      REDIRECT_URI: http://localhost/onedrive/callback
+      MONGO_URI: mongodb://${MONGO_USER:?set MONGO_USER}:${MONGO_PASSWORD:?set MONGO_PASSWORD}@mongodb:27017/${MONGO_DB:-infactra_db}?authSource=admin
+      NODE_ENV: production
+      # Public origin — CORS, OAuth returns and emailed links all derive from it.
+      FRONTEND_URL: https://${APP_DOMAIN}
+      API_BASE_URL: https://${APP_DOMAIN}
+      GOOGLE_REDIRECT_URI: https://${APP_DOMAIN}/google/callback
+      REDIRECT_URI: https://${APP_DOMAIN}/onedrive/callback
+      # caddy → nginx, so client IPs are two hops away.
+      TRUST_PROXY_HOPS: "2"
     depends_on:
       mongodb:
         condition: service_healthy
-      mysql:
-        condition: service_healthy
     volumes:
       - uploads_data:/app/uploads
+    logging: *logging
 
-  frontend:
-    build:
-      context: ./apps/web
-      dockerfile: Dockerfile
+  mongodb:
+    image: mongo:7
     restart: unless-stopped
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
+    # Not published to the host — reachable only on the internal network.
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:?set MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?set MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-infactra_db}
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    logging: *logging
 
 volumes:
   mongo_data:
-  mysql_data:
   uploads_data:
+  caddy_data:
+  caddy_config:

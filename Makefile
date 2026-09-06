@@ -1,5 +1,6 @@
-.PHONY: help dev dev-build prod prod-build down logs logs-be logs-fe clean \
-        shell-be shell-fe shell-db install seed seed-fresh
+.PHONY: help dev dev-build prod prod-build prod-logs prod-seed prod-migrate \
+        prod-migrate-dry down logs logs-be logs-fe clean shell-be shell-fe shell-db \
+        install seed seed-fresh
 
 COMPOSE_DEV  = docker compose -f docker-compose.dev.yml
 COMPOSE_PROD = docker compose -f docker-compose.yml
@@ -14,7 +15,9 @@ help:
 	@echo "    make dev-build      Rebuild images then start dev"
 	@echo ""
 	@echo "  Production  (nginx on :80, detached):"
-	@echo "    make prod           Start prod stack"
+	@echo "    make prod           Start prod stack (needs ./.env)"
+	@echo "    make prod-logs      Tail production logs"
+	@echo "    make prod-migrate   Run the multi-tenant migration"
 	@echo "    make prod-build     Rebuild then start prod"
 	@echo ""
 	@echo "  Utilities:"
@@ -38,10 +41,24 @@ dev-build:
 
 # ──────────────────────────────────────────────────────────────────────────────
 prod:
+	@test -f .env || { echo "Missing .env — cp .env.prod.example .env and edit it"; exit 1; }
 	$(COMPOSE_PROD) up -d
 
 prod-build:
+	@test -f .env || { echo "Missing .env — cp .env.prod.example .env and edit it"; exit 1; }
 	$(COMPOSE_PROD) up -d --build
+
+prod-logs:
+	$(COMPOSE_PROD) logs -f
+
+prod-seed:
+	$(COMPOSE_PROD) exec backend node scripts/seed.js
+
+prod-migrate:
+	$(COMPOSE_PROD) exec backend node scripts/migrate-multitenant.js
+
+prod-migrate-dry:
+	$(COMPOSE_PROD) exec backend node scripts/migrate-multitenant.js --dry-run
 
 # ──────────────────────────────────────────────────────────────────────────────
 down:

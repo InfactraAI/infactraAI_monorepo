@@ -1,0 +1,25 @@
+# Automatic HTTPS. Caddy obtains and renews a Let's Encrypt certificate for
+# {$APP_DOMAIN} on its own; certificates persist in the caddy_data volume.
+#
+# For expiry notices, add a global options block above this one:
+#   { email ops@yourdomain.com }
+# Leave it out entirely rather than empty — Caddy rejects a valueless directive.
+{$APP_DOMAIN} {
+	encode zstd gzip
+
+	# Everything goes to the same nginx image the dev stack uses, which serves
+	# the SPA and proxies API paths — so the two environments do not diverge.
+	reverse_proxy frontend:80
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}

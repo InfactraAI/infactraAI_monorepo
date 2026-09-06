@@ -277,20 +277,29 @@ apps/web/src/app/
 
 ## Infrastructure
 
-Both stacks publish only nginx on `:80`.
+Only the edge proxy is published; everything else is internal to the Docker network.
 
 ```
-docker-compose.dev.yml            docker-compose.yml
-  nginx      :80                    frontend  :80   multi-stage build
-  frontend   ng serve, hot reload              stage 1 node:22 → ng build
-  backend    nodemon, ./apps/api mounted       stage 2 nginx:alpine
-  mongodb    volume mongo_data_dev    backend   node server.js
-  mysql      unused                  mongodb   volume mongo_data
-                                     mysql     unused
+docker-compose.dev.yml                docker-compose.yml  (production)
+  nginx     :80                         caddy     :80 :443   automatic TLS
+  frontend  ng serve, hot reload         frontend  nginx + built SPA
+  backend   nodemon, ./apps/api mounted  backend   node server.js
+  mongodb   volume mongo_data_dev        mongodb   authenticated, volume
 ```
 
-`backend` waits on `service_healthy` for both databases. MySQL is started and
-gated on but nothing connects to it — see Known issues in the README.
+Production reads deployment settings from `.env` at the repo root
+(`APP_DOMAIN`, `MONGO_*`, `TLS_EMAIL`) and application settings from
+`apps/api/.env`. Compose derives `FRONTEND_URL`, `API_BASE_URL` and both OAuth
+redirect URIs from `APP_DOMAIN`, so there is one place to change the hostname.
+
+Caddy terminates TLS and proxies to the same nginx image the dev stack uses, so
+the two environments share proxy behaviour rather than diverging. Certificates
+live in the `caddy_data` volume.
+
+MySQL was removed from both stacks — nothing connected to it, and it gated
+backend startup on a healthcheck for a database no code opened.
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the EC2 runbook.
 
 ---
 
@@ -305,10 +314,15 @@ Addressed:
 - Invitation tokens stored only as hashes; single-use with expiry
 - Passwords bcrypt-hashed at cost 12 and never emailed
 
-Outstanding:
+- HTTPS with automatic renewal, HSTS and hardening headers (production)
+- MongoDB authenticated and unreachable outside the Docker network
+- `helmet` security headers on the API
+- Rate limiting: 10 failed auth attempts / 15 min per IP, 30 invitations / hour,
+  300 requests / min overall. `TRUST_PROXY_HOPS` sets Express's `trust proxy` to
+  the real hop count so limits key on the client IP rather than the proxy's — a
+  blanket `true` would let anyone spoof `X-Forwarded-For` and evade them
 
-- No rate limiting on login, registration, password reset or invitations
-- No `helmet` or security headers
+Outstanding:
 - `POST /tally/connect` takes an arbitrary host and port, so an authenticated
   user can probe the container's network
 - Uploads have no type or size limit and are served back from `/uploads`

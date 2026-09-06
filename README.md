@@ -16,7 +16,7 @@ Multi-tenant: many organisations run on one deployment, each seeing only its own
 | Database | MongoDB 7 (Mongoose) |
 | File storage | Local disk (`uploads/`) via Multer |
 | Integrations | Google Sheets (OAuth2 · Picker) · Microsoft OneDrive (Graph API · OAuth2) · Tally ERP (XML/HTTP) |
-| Serving | nginx (SPA + API reverse proxy) |
+| Serving | nginx (SPA + API proxy); Caddy terminates TLS in production |
 | Orchestration | Docker Compose · Make |
 
 ---
@@ -179,6 +179,25 @@ make install        npm install both apps (local dev without Docker)
 
 ---
 
+## Deploying
+
+See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for the full EC2 runbook. In short:
+
+```bash
+cp .env.prod.example .env
+```
+
+Set `APP_DOMAIN` and `MONGO_PASSWORD`, fill in `apps/api/.env`, then:
+
+```bash
+make prod-build
+```
+
+Caddy obtains a Let's Encrypt certificate automatically. A real DNS name is
+required — Google rejects OAuth redirect URIs on bare IPs or plain `http://`.
+
+---
+
 ## Migrating an existing install
 
 If you have a database from before organisations existed, back it up, then:
@@ -209,7 +228,7 @@ Only nginx is published. Everything else talks over the internal Docker network.
 | Mode | Service | URL |
 |---|---|---|
 | Dev | nginx → Angular dev server + API | `http://localhost` |
-| Prod | nginx → built SPA + API | `http://localhost` |
+| Prod | Caddy (TLS) → nginx → built SPA + API | `https://$APP_DOMAIN` |
 
 nginx proxies `/auth`, `/company`, `/org`, `/google`, `/onedrive`, `/tally`,
 `/uploads` and `/health` to the backend; everything else falls through to the SPA.
@@ -311,9 +330,9 @@ See [`docs/postman_collection.json`](docs/postman_collection.json) for a ready-t
 | `GOOGLE_API_KEY` | No | Browser key for the Picker |
 | `GOOGLE_PROJECT_NUMBER` | No | GCP project number, required by the Picker for `drive.file` |
 | `CLIENT_ID` / `CLIENT_SECRET` | No | Azure app for OneDrive |
+| `TRUST_PROXY_HOPS` | No | Proxy hops in front of the API (prod: `2`). Required for correct rate-limit client IPs |
 | `TENANT_ID` | No | Azure tenant (default `common`) |
 | `REDIRECT_URI` | No | OneDrive OAuth callback |
-| `DB_*` | No | MySQL settings. Nothing reads these — see Known issues |
 
 ---
 
@@ -342,11 +361,6 @@ Without nginx the frontend serves on `:4200` and the API on `:3000`, so set
 
 ## Known issues
 
-- **`make prod` fails to build.** `dashboard.less` is 9.46 kB against an 8 kB
-  `anyComponentStyle` budget in `angular.json`, which fails the production build and
-  therefore the frontend Docker image. Either raise the budget or trim the file.
-- **MySQL is unused.** Both compose files start MySQL 8 and gate backend startup on
-  its health, but no code connects to it and there is no driver in `package.json`.
 - **Several screens are static.** Dashboard, MIS and Reconciliation render hardcoded
   figures. Ask AI matches questions with regexes and generates chart data randomly —
   there is no model behind it.

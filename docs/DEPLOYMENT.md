@@ -53,13 +53,42 @@ DNS record and Google redirect URI both break on the next reboot.
 
 Do **not** open 27017. Mongo is only reachable on the Docker network.
 
-## 2. Point DNS at it
+## 2. Hostname
 
-An `A` record for `app.yourdomain.com` → the elastic IP. Verify before going
-further, because Caddy cannot issue a certificate until it resolves:
+You need a DNS name, not a bare IP — Google refuses OAuth redirect URIs on raw
+addresses. There are two ways to get one.
+
+### Option A — no domain purchase (POC / demo)
+
+`sslip.io` is a public wildcard DNS service that resolves any IP encoded in the
+hostname. Take your elastic IP, replace the dots with dashes, append `.sslip.io`:
+
+```
+elastic IP   13.234.56.78
+APP_DOMAIN   13-234-56-78.sslip.io
+```
+
+Nothing else changes. Caddy obtains a real Let's Encrypt certificate for it, the
+URL is publicly shareable, and Google accepts it as a redirect URI. Because the
+name is derived from your elastic IP it stays stable across reboots.
+
+> **One risk.** `sslip.io` is not on the Public Suffix List, so every user of it
+> shares a single Let's Encrypt quota of 50 certificates per week. If that quota
+> is exhausted when you deploy, certificate issuance fails and there is nothing
+> you can do but wait or switch to Option B. It usually works; it is not
+> guaranteed. Check Caddy's logs for `certificate obtained successfully`.
+
+### Option B — a real domain
+
+Register one (roughly ₹800/year), add an `A` record pointing at the elastic IP,
+and set `APP_DOMAIN` to it. No caveats, and it is what you will need for real
+customers anyway.
+
+Either way, confirm it resolves to your instance before continuing — Caddy
+cannot get a certificate until it does:
 
 ```bash
-dig +short app.yourdomain.com
+dig +short <your APP_DOMAIN>
 ```
 
 ## 3. Install Docker
@@ -222,6 +251,7 @@ Still outstanding:
 | Symptom | Cause |
 |---|---|
 | Caddy loops on certificate errors | DNS not resolving yet, or 80/443 blocked. Check `dig` and the security group |
+| `too many certificates already issued` | sslip.io's shared Let's Encrypt quota is exhausted. Wait, or move to a real domain |
 | `redirect_uri_mismatch` from Google | The console URI must match `https://APP_DOMAIN/google/callback` exactly — no trailing slash |
 | Build killed mid-`ng build` | Out of memory. Use t3.medium or add swap |
 | `Session predates organisations` | Expected once after the multi-tenant change. Sign in again |

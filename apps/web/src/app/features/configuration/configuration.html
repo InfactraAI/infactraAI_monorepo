@@ -18,18 +18,7 @@
     </div>
      </div>
 
-<h3 class="section-title">
-    Desktop tools
-    @if(selectedSource){
-    <span class="breadcrumb">
-        <mat-icon class="arrow-icon">chevron_right</mat-icon>
-        {{ selectedSource }}
-    </span>
-    }
-</h3>
-<!-- @if(selectedSource === 'Tally') {
-<app-tally></app-tally>
-}@else { -->
+<h3 class="section-title">Desktop tools</h3>
 <div class="card-grid">
     <!-- Tally -->
     <div class="card">
@@ -49,10 +38,18 @@
             <img src="assets/icons/onedrive.png" class="icon-img" />
             <div>
                 <h4>OneDrive</h4>
-                <p>Cloud Storage</p>
+                @if (oneDrive.connected) {
+                    <p class="connected-line" [title]="oneDrive.detail">
+                        <span class="dot"></span>{{ oneDrive.detail }}
+                    </p>
+                } @else {
+                    <p>Cloud Storage</p>
+                }
             </div>
         </div>
-        <button class="connect-btn" (click)="connectOneDrive()">Connect</button>
+        <button class="connect-btn" (click)="connectOneDrive()">
+            {{ oneDrive.connected ? 'Manage' : 'Connect' }}
+        </button>
         
     </div>
 
@@ -87,11 +84,19 @@
 
                     <div class="card-content">
                         <h4>Google Sheets</h4>
-                        <p>Warehouse & Data Lakes</p>
+                        @if (googleSheets.connected) {
+                            <p class="connected-line" [title]="googleSheets.detail">
+                                <span class="dot"></span>{{ googleSheets.detail }}
+                            </p>
+                        } @else {
+                            <p>Warehouse &amp; Data Lakes</p>
+                        }
                     </div>
                 </div>
 
-                <button class="connect-btn" (click)="connectGoogleSheet()">Connect</button>
+                <button class="connect-btn" (click)="connectGoogleSheet()">
+                    {{ googleSheets.connected ? 'Manage' : 'Connect' }}
+                </button>
             </div>
 
             <!-- Zoho Books -->

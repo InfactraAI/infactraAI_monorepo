@@ -193,8 +193,10 @@ Set `APP_DOMAIN` and `MONGO_PASSWORD`, fill in `apps/api/.env`, then:
 make prod-build
 ```
 
-Caddy obtains a Let's Encrypt certificate automatically. A real DNS name is
-required — Google rejects OAuth redirect URIs on bare IPs or plain `http://`.
+Caddy obtains a Let's Encrypt certificate automatically. A DNS name is required —
+Google rejects OAuth redirect URIs on bare IPs or plain `http://`. For a demo you
+can skip buying one: set `APP_DOMAIN` to `<your-dashed-ip>.sslip.io`, which
+resolves to your server with no DNS setup.
 
 ---
 

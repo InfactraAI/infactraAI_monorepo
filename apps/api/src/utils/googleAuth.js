@@ -17,14 +17,23 @@ const TOKEN_URL    = 'https://oauth2.googleapis.com/token';
 const REVOKE_URL   = 'https://oauth2.googleapis.com/revoke';
 const USERINFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo';
 
-// drive.file is a NON-restricted scope: it grants access only to files the
-// user hands us through the Google Picker. Keeps the consent screen calm and
-// avoids Google's annual CASA security assessment.
+/**
+ * drive.file grants access only to files handed to us through the Picker —
+ * the narrowest option, but it cannot authorise a spreadsheet the user pastes
+ * a link to, because that file was never "opened by the app".
+ *
+ * spreadsheets.readonly covers the paste path. It is a *sensitive* scope
+ * (Google brand review before publishing to external users) but NOT a
+ * *restricted* one, so it still avoids the annual CASA security assessment
+ * that drive.readonly would trigger. Read-only, spreadsheets only — it cannot
+ * see the rest of Drive.
+ */
 const SCOPES = [
   'openid',
   'email',
   'profile',
   'https://www.googleapis.com/auth/drive.file',
+  'https://www.googleapis.com/auth/spreadsheets.readonly',
 ].join(' ');
 
 const REFRESH_BUFFER_MS = 5 * 60 * 1000;

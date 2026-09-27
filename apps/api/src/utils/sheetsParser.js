@@ -22,6 +22,23 @@ const auth = (accessToken) => ({ headers: { Authorization: `Bearer ${accessToken
 
 const isNative = (mimeType) => !mimeType || mimeType === NATIVE_SHEET_MIME;
 
+/**
+ * Accepts anything a user is likely to paste: a full edit URL, a sharing URL,
+ * or the bare id. Google ids are 20+ chars of [A-Za-z0-9_-].
+ */
+exports.parseSpreadsheetId = (input) => {
+  const raw = String(input || '').trim();
+  if (!raw) return null;
+
+  const fromUrl = raw.match(/\/spreadsheets\/d\/([A-Za-z0-9_-]{20,})/);
+  if (fromUrl) return fromUrl[1];
+
+  // A bare id, but not a URL we failed to understand.
+  if (/^[A-Za-z0-9_-]{20,}$/.test(raw)) return raw;
+
+  return null;
+};
+
 exports.NATIVE_SHEET_MIME = NATIVE_SHEET_MIME;
 exports.isNative = isNative;
 

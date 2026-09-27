@@ -7,9 +7,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { OneDriveService } from '../../core/services/onedrive.service';
 
+// Destinations inside Infactra, not OneDrive folders. HR is listed but
+// disabled — hr.ts fetches imported data and discards it.
 const DEPARTMENTS = [
-  { key: 'inventory', label: 'Inventory', feeds: 'the Inventory table' },
-  { key: 'hr', label: 'HR', feeds: 'the HR screens' },
+  { key: 'inventory', label: 'Inventory', feeds: 'Shows up in the Inventory table', available: true },
+  { key: 'hr', label: 'HR', feeds: 'The HR screens can\'t display imported data yet', available: false },
 ];
 
 /**
@@ -75,6 +77,10 @@ export class OneDriveConfigComponent implements OnInit {
   }
 
   connect(): void {
+    if (!this.departments.find((d) => d.key === this.selectedDepartment)?.available) {
+      this.toast('That destination cannot display imported data yet.', 'error');
+      return;
+    }
     this.busy = true;
     this.oneDriveService.authUrl(this.selectedDepartment).subscribe({
       next: ({ url }) => { window.location.href = url; },

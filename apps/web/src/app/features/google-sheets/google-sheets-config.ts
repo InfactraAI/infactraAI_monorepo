@@ -17,10 +17,17 @@ declare const google: any;
 
 const GAPI_SRC = 'https://apis.google.com/js/api.js';
 
-/** Departments that an imported sheet can feed, and the screen each one drives. */
+/**
+ * Destinations inside Infactra — not Google Sheets. Picking one decides where
+ * imported rows land.
+ *
+ * `available` reflects whether a screen actually renders the data. HR fetches
+ * it and discards it (hr.ts has no table), so offering it would report a
+ * successful import that shows up nowhere.
+ */
 const DEPARTMENTS = [
-  { key: 'inventory', label: 'Inventory', feeds: 'the Inventory table' },
-  { key: 'hr', label: 'HR', feeds: 'the HR screens' },
+  { key: 'inventory', label: 'Inventory', feeds: 'Shows up in the Inventory table', available: true },
+  { key: 'hr', label: 'HR', feeds: 'The HR screens can\'t display imported data yet', available: false },
 ];
 
 @Component({
@@ -32,12 +39,17 @@ const DEPARTMENTS = [
 })
 export class GoogleSheetsConfigComponent implements OnInit {
   departments = DEPARTMENTS;
+  /** Guard: never let an unavailable destination be picked. */
+  private available = DEPARTMENTS.filter((d) => d.available);
 
   loading = true;
   busy = false;
   status: GoogleStatus | null = null;
 
   selectedDepartment = 'inventory';
+
+  /** Paste path — works when the Picker iframe is blocked. */
+  sheetUrl = '';
 
   /** Set when a picked spreadsheet has more than one tab and needs a choice. */
   pendingPick: {
@@ -166,6 +178,12 @@ export class GoogleSheetsConfigComponent implements OnInit {
 
   async openPicker(): Promise<void> {
     const department = this.selectedDepartment;
+
+    if (!this.available.some((d) => d.key === department)) {
+      this.toast('That destination cannot display imported data yet.', 'error');
+      return;
+    }
+
     this.busy = true;
 
     try {
@@ -185,6 +203,9 @@ export class GoogleSheetsConfigComponent implements OnInit {
         .setAppId(cfg.appId)
         .setOAuthToken(cfg.accessToken)
         .setDeveloperKey(cfg.apiKey)
+        // Without an explicit origin the Picker infers one, and any mismatch
+        // makes docs.google.com reject the frame with a bare 403.
+        .setOrigin(`${window.location.protocol}//${window.location.host}`)
         .setTitle('Choose a spreadsheet')
         .addView(view)
         .setCallback((res: any) => this.onPicked(res, department))
@@ -217,6 +238,32 @@ export class GoogleSheetsConfigComponent implements OnInit {
         }
         this.busy = false;
         this.pendingPick = { spreadsheetId, title, department, tabs: sheets, chosen: sheets[0].title, mimeType };
+      },
+      error: (err) => {
+        this.busy = false;
+        this.toast(this.messageFrom(err), 'error');
+      },
+    });
+  }
+
+  /** Import from a pasted link. No iframe, so nothing to be blocked. */
+  importFromUrl(): void {
+    const url = this.sheetUrl.trim();
+    if (!url) return;
+
+    const department = this.selectedDepartment;
+    if (!this.available.some((d) => d.key === department)) {
+      this.toast('That destination cannot display imported data yet.', 'error');
+      return;
+    }
+
+    this.busy = true;
+    this.sheets.selectSheet({ url, department }).subscribe({
+      next: (res) => {
+        this.busy = false;
+        this.sheetUrl = '';
+        this.toast(res.message, 'success');
+        this.refresh();
       },
       error: (err) => {
         this.busy = false;

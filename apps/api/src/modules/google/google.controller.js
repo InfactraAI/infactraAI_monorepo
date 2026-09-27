@@ -1,7 +1,7 @@
 const FileData = require('../../models/FileData');
 const GoogleConnection = require('../../models/GoogleConnection');
 const googleAuth = require('../../utils/googleAuth');
-const { getMetadata, readSheet } = require('../../utils/sheetsParser');
+const { getMetadata, readSheet, parseSpreadsheetId } = require('../../utils/sheetsParser');
 const googleErrors = require('../../utils/googleErrors');
 
 const frontendUrl = () => process.env.FRONTEND_URL || 'http://localhost';
@@ -39,6 +39,27 @@ function describeGoogleFailure(err) {
   }
 
   const wrapped = googleErrors.wrap(err);
+
+  // A token minted before spreadsheets.readonly was added cannot read a pasted
+  // sheet. Google's wording ("insufficient authentication scopes") tells the
+  // user nothing actionable.
+  if (/insufficient authentication scopes/i.test(err.response?.data?.error?.message || '')) {
+    const e = new Error(
+      'Your Google connection was made before this feature existed. ' +
+      'Click Disconnect, then Continue with Google to re-authorise.'
+    );
+    e.status = 403;
+    return e;
+  }
+
+  if (err.response?.status === 404) {
+    const e = new Error(
+      'That spreadsheet could not be opened. Check the link is right and that ' +
+      'the connected Google account has access to it.'
+    );
+    e.status = 404;
+    return e;
+  }
 
   if (/must not be an Office file/i.test(wrapped.message)) {
     wrapped.message =
@@ -153,7 +174,10 @@ exports.pickerConfig = async (req, res, next) => {
 exports.listTabs = async (req, res, next) => {
   try {
     const accessToken = await googleAuth.getValidAccessToken(req.orgId);
-    const meta = await getMetadata(accessToken, req.params.spreadsheetId, req.query.mimeType);
+    const id = parseSpreadsheetId(req.params.spreadsheetId);
+    if (!id) return res.status(400).json({ message: 'Invalid spreadsheet reference' });
+
+    const meta = await getMetadata(accessToken, id, req.query.mimeType);
     res.json({ title: meta.title, sheets: meta.sheets });
   } catch (err) {
     next(describeGoogleFailure(err));
@@ -196,10 +220,18 @@ async function pullIntoFileData(accessToken, { orgId, spreadsheetId, sheetName, 
 
 exports.selectSheet = async (req, res, next) => {
   try {
-    const { spreadsheetId, department, sheetName, mimeType } = req.body;
+    const { department, sheetName, mimeType } = req.body;
 
-    if (!spreadsheetId || !department) {
-      return res.status(400).json({ message: 'spreadsheetId and department are required' });
+    // The Picker sends an id; the paste field sends whatever the user copied.
+    const spreadsheetId = parseSpreadsheetId(req.body.spreadsheetId || req.body.url);
+
+    if (!spreadsheetId) {
+      return res.status(400).json({
+        message: "That doesn't look like a Google Sheets link. Paste the URL from your browser's address bar.",
+      });
+    }
+    if (!department) {
+      return res.status(400).json({ message: 'department is required' });
     }
 
     const conn = await GoogleConnection.findOne({ orgId: req.orgId });

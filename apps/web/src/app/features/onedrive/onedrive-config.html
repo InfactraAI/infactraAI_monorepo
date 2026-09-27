@@ -24,18 +24,28 @@
         Drive folder named after the department and imports the first workbook inside it.
       </p>
 
+      <p class="step-label"><span class="step-num">1</span> Where should this data go?</p>
+
       <div class="dept-row">
         @for (d of departments; track d.key) {
-          <label class="dept-option" [class.selected]="selectedDepartment === d.key">
-            <input type="radio" name="department" [value]="d.key" [(ngModel)]="selectedDepartment" />
-            <span class="dept-name">{{ d.label }}</span>
-            <span class="dept-feeds">Feeds {{ d.feeds }}</span>
-            @if (driveFor(d.key); as drive) {
+          <label class="dept-option"
+                 [class.selected]="selectedDepartment === d.key && d.available"
+                 [class.unavailable]="!d.available">
+            <input type="radio" name="department" [value]="d.key"
+                   [disabled]="!d.available" [(ngModel)]="selectedDepartment" />
+            <span class="dept-name">
+              {{ d.label }}
+              @if (!d.available) { <span class="pill">Not yet</span> }
+            </span>
+            <span class="dept-feeds">{{ d.feeds }}</span>
+            @if (d.available && driveFor(d.key); as drive) {
               <span class="dept-warn">Connected as {{ drive.email }}</span>
             }
           </label>
         }
       </div>
+
+      <p class="step-label"><span class="step-num">2</span> Sign in to Microsoft</p>
 
       <button class="btn-primary" type="button" (click)="connect()" [disabled]="busy">
         <mat-icon>link</mat-icon>

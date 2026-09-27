@@ -390,3 +390,37 @@
         width: 100%;
     }
 }
+/* ── Live connection state on connector cards ───────────── */
+
+/* Cards were laid out for a short fixed subtitle. Once one shows a real
+   account email, .card-left grows and pushes the button outside the card,
+   where `overflow: hidden` clips it. Let the subtitle shrink and truncate;
+   never truncate the connector's name. */
+
+.card, .connector-card {
+    .card-left { min-width: 0; flex: 1 1 auto; }
+    .card-content, .card-left > div { min-width: 0; }
+
+    p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.connect-btn { flex: 0 0 auto; margin-left: auto; white-space: nowrap; }
+
+.connected-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #0b8043 !important;
+
+    .dot {
+        flex: 0 0 auto;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #0f9d58;
+    }
+}

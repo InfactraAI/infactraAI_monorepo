@@ -86,25 +86,54 @@
     <!-- ADD A SHEET -->
     <div class="gs-card">
       <h3>Import a spreadsheet</h3>
-      <p class="lede">Choose where the data should land, then pick the sheet.</p>
+      <p class="lede">
+        Two steps: choose where the data should land inside Infactra, then pick the
+        spreadsheet from your Google Drive.
+      </p>
+
+      <p class="step-label"><span class="step-num">1</span> Where should this data go?</p>
 
       <div class="dept-row">
         @for (d of departments; track d.key) {
-          <label class="dept-option" [class.selected]="selectedDepartment === d.key">
-            <input type="radio" name="department" [value]="d.key" [(ngModel)]="selectedDepartment" />
-            <span class="dept-name">{{ d.label }}</span>
-            <span class="dept-feeds">Feeds {{ d.feeds }}</span>
-            @if (sheetFor(d.key); as existing) {
+          <label class="dept-option"
+                 [class.selected]="selectedDepartment === d.key && d.available"
+                 [class.unavailable]="!d.available">
+            <input type="radio" name="department" [value]="d.key"
+                   [disabled]="!d.available" [(ngModel)]="selectedDepartment" />
+            <span class="dept-name">
+              {{ d.label }}
+              @if (!d.available) { <span class="pill">Not yet</span> }
+            </span>
+            <span class="dept-feeds">{{ d.feeds }}</span>
+            @if (d.available && sheetFor(d.key); as existing) {
               <span class="dept-warn">Will replace “{{ existing.title }}”</span>
             }
           </label>
         }
       </div>
 
-      <button class="btn-primary" type="button" (click)="openPicker()" [disabled]="busy">
-        <mat-icon>add</mat-icon>
-        {{ busy ? 'Working…' : 'Choose from Google Drive' }}
+      <p class="step-label"><span class="step-num">2</span> Which spreadsheet?</p>
+
+      <div class="url-row">
+        <input class="text-input" type="url" [(ngModel)]="sheetUrl" [disabled]="busy"
+               (keyup.enter)="importFromUrl()"
+               placeholder="Paste a Google Sheets link…" />
+        <button class="btn-primary" type="button" (click)="importFromUrl()"
+                [disabled]="busy || !sheetUrl.trim()">
+          {{ busy ? 'Working…' : 'Import' }}
+        </button>
+      </div>
+      <p class="fineprint">Open the sheet in Google and copy the URL from the address bar.</p>
+
+      <div class="or-divider"><span>or</span></div>
+
+      <button class="btn-ghost wide" type="button" (click)="openPicker()" [disabled]="busy">
+        <mat-icon>folder_open</mat-icon> Browse Google Drive
       </button>
+      <p class="fineprint">
+        Opens Google's own file picker. If it shows a 403, your browser is blocking
+        third-party cookies — paste the link instead.
+      </p>
     </div>
 
     <!-- TAB CHOOSER -->

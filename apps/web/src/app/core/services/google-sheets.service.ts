@@ -62,7 +62,7 @@ export class GoogleSheetsService {
     );
   }
 
-  selectSheet(payload: { spreadsheetId: string; department: string; sheetName?: string; mimeType?: string }) {
+  selectSheet(payload: { spreadsheetId?: string; url?: string; department: string; sheetName?: string; mimeType?: string }) {
     return this.http.post<{ message: string; sheet: ConnectedSheet }>(`${this.base}/sheets`, payload);
   }
 

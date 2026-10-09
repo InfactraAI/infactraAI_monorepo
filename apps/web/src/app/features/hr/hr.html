@@ -1,31 +1,26 @@
+<div class="page page--wide">
+  <header class="page__head">
+    <div class="page__title">
+      <h1>HR</h1>
+      <p>Attendance and salary for the current period</p>
+    </div>
+    <input class="input" type="date" [(ngModel)]="selectedDate" (change)="onDateChange($event)"
+           style="width: auto" />
+  </header>
 
+  <div class="stack">
+    <nav class="subnav">
+      <a class="subnav__tab" routerLink="attendance" routerLinkActive="is-active"
+         [routerLinkActiveOptions]="{exact: true}">Attendance</a>
+      <a class="subnav__tab" routerLink="salary" routerLinkActive="is-active">Salary</a>
+    </nav>
 
-<!-- ✅ HR-AI Sub Navbar -->
-<div class="sub-navbar">
+    <div class="notice">
+      <mat-icon>info</mat-icon>
+      <div>These sheets are stored in your browser, not on the server. Imported HR
+        spreadsheets aren't displayed here yet.</div>
+    </div>
 
-  <button 
-    routerLink="attendance" 
-    routerLinkActive="active-btn"
-    [routerLinkActiveOptions]="{exact: true}">
-    Attendance
-  </button>
-  
-  <button 
-    routerLink="salary" 
-    routerLinkActive="active-btn">
-    Salary
-  </button>
-
-<div class="nav-controls">
-    <input 
-      type="date" 
-      [(ngModel)]="selectedDate" 
-      (change)="onDateChange($event)"
-      class="date-picker">
+    <router-outlet></router-outlet>
   </div>
-
-</div>
-
-<div class="content-area">
-  <router-outlet></router-outlet>
 </div>

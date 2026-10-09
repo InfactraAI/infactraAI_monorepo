@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BaseChartDirective, provideCharts } from 'ng2-charts';
 import {
@@ -12,11 +12,10 @@ import {
   ChartConfiguration,
   BarController
 } from 'chart.js';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { verticalHoverPlugin } from '../../shared/plugins/chart-plugin';
 import { OneDriveService } from '../../core/services/onedrive.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 Chart.register(
   CategoryScale,
@@ -31,13 +30,7 @@ Chart.register(
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    CommonModule,
-    BaseChartDirective,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-  ],
+  imports: [CommonModule, BaseChartDirective, MatIconModule],
   providers: [provideCharts()],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.less']
@@ -71,23 +64,23 @@ export class AdminDashboard implements OnInit {
       {
         label: 'Inflow',
         data: [120, 95, 130, 85, 110, 78, 125, 98, 112, 140, 90, 115, 122],
-        backgroundColor: '#99f6e4',
-        borderRadius: 4,
-        barThickness: 10,
+        backgroundColor: '#1a7f43',
+        borderRadius: 1,
+        barThickness: 8,
       },
       {
         label: 'Net',
         data: [25, 15, 30, 12, 15, 10, 18, 8, 5, 22, 9, 11, 14],
-        backgroundColor: '#c7d2fe',
-        borderRadius: 4,
-        barThickness: 10,
+        backgroundColor: '#0033a0',
+        borderRadius: 1,
+        barThickness: 8,
       },
       {
         label: 'Outflow',
         data: [90, 110, 95, 75, 105, 88, 115, 100, 120, 110, 85, 98, 105],
-        backgroundColor: '#fecaca',
-        borderRadius: 4,
-        barThickness: 10,
+        backgroundColor: '#c0281c',
+        borderRadius: 1,
+        barThickness: 8,
       }
     ]
   };
@@ -100,19 +93,19 @@ export class AdminDashboard implements OnInit {
       y: {
         beginAtZero: true,
         border: { display: false },
-        grid: { color: '#f1f5f9' },
+        grid: { color: '#f0f0f0' },
         ticks: {
           stepSize: 70,
           callback: (value) => value === 0 ? '0' : `${value}K`,
-          color: '#94a3b8',
+          color: '#9b9b9b',
           font: { size: 10 }
         }
       },
       x: {
         grid: { display: false },
         ticks: {
-          color: '#94a3b8',
-          font: { size: 10, family: 'Plus Jakarta Sans' }
+          color: '#9b9b9b',
+          font: { size: 10, family: 'Inter' }
         }
       }
     },
@@ -126,17 +119,17 @@ export class AdminDashboard implements OnInit {
           pointStyle: 'rectRounded',
           boxWidth: 8,
           padding: 20,
-          font: { size: 12, family: 'Plus Jakarta Sans' }
+          font: { size: 12, family: 'Inter' }
         }
       },
       tooltip: {
         enabled: true,
         backgroundColor: '#ffffff',
-        borderColor: '#E5E7EB',
+        borderColor: '#e4e4e4',
         borderWidth: 1,
-        titleColor: '#111827',
-        bodyColor: '#111827',
-        cornerRadius: 8,
+        titleColor: '#0a0a0a',
+        bodyColor: '#0a0a0a',
+        cornerRadius: 4,
         padding: 14,
         displayColors: true,
         titleFont: { size: 14, weight: 600 },
@@ -149,17 +142,57 @@ export class AdminDashboard implements OnInit {
           },
           labelTextColor: (context) => {
             const label = context.dataset.label;
-            if (label === 'Inflow')  return '#0d9488';
-            if (label === 'Outflow') return '#e11d48';
-            if (label === 'Net')     return '#4f46e5';
-            return '#111827';
+            if (label === 'Inflow')  return '#1a7f43';
+            if (label === 'Outflow') return '#c0281c';
+            if (label === 'Net')     return '#0033a0';
+            return '#0a0a0a';
           }
         }
       }
     }
   };
 
-  constructor(private onedriveService: OneDriveService) {}
+  constructor(private onedriveService: OneDriveService, private theme: ThemeService) {
+    // Chart.js paints to canvas, so CSS variables cannot reach it. Re-read the
+    // tokens whenever the theme changes and hand Chart.js fresh objects.
+    effect(() => { this.theme.current(); this.paintChart(); });
+  }
+
+  private paintChart(): void {
+    const t = (n: string) => this.theme.token(n);
+    const [inflow, net, outflow] = [t('--gain'), t('--accent'), t('--loss')];
+
+    this.barChartData = {
+      ...this.barChartData,
+      datasets: this.barChartData.datasets.map((d, i) => ({
+        ...d, backgroundColor: [inflow, net, outflow][i],
+      })),
+    };
+
+    // The options carry callbacks, so structuredClone would throw. Spread only
+    // the levels we touch and hand Chart.js a new reference.
+    const b: any = this.barChartOptions;
+    const labelColor = { Inflow: inflow, Outflow: outflow, Net: net } as Record<string, string>;
+    this.barChartOptions = {
+      ...b,
+      animation: false,
+      scales: {
+        ...b.scales,
+        y: { ...b.scales.y, grid: { ...b.scales.y.grid, color: t('--rule-2') }, ticks: { ...b.scales.y.ticks, color: t('--ink-4') } },
+        x: { ...b.scales.x, ticks: { ...b.scales.x.ticks, color: t('--ink-4') } },
+      },
+      plugins: {
+        ...b.plugins,
+        legend: { ...b.plugins.legend, labels: { ...b.plugins.legend.labels, color: t('--ink-3') } },
+        tooltip: {
+          ...b.plugins.tooltip,
+          backgroundColor: t('--surface'), borderColor: t('--rule'),
+          titleColor: t('--ink'), bodyColor: t('--ink'),
+          callbacks: { ...b.plugins.tooltip.callbacks, labelTextColor: (ctx: any) => labelColor[ctx.dataset.label] ?? t('--ink') },
+        },
+      },
+    };
+  }
 
   ngOnInit() {
     this.onedriveService.getOneDrives().subscribe({

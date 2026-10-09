@@ -3,24 +3,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatCardModule } from '@angular/material/card';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    FormsModule,
-    CommonModule,
-    MatFormFieldModule,
-    MatCardModule,
-    MatInputModule,
-    MatButtonModule
-  ],
+  imports: [FormsModule, CommonModule],
   templateUrl: './login.html',
   styleUrl: './login.less',
 })

@@ -1,15 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
 
 import { OneDriveService } from '../../core/services/onedrive.service';
 
 @Component({
   selector: 'app-stock',
   standalone: true,
-  imports: [MatTableModule, MatIconModule, CommonModule, MatCardModule],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './inventory.html',
   styleUrl: './inventory.less',
 })
@@ -26,6 +24,12 @@ export class InventoryComponent implements OnInit {
       this.tableData = res.data;
       this.displayedColumns = res.columns;
     });
+  }
+
+  /** Right-align numeric cells so columns of figures line up. */
+  isNumeric(v: unknown): boolean {
+    if (v === null || v === undefined || v === '') return false;
+    return !isNaN(Number(String(v).replace(/[,\s₹$]/g, '')));
   }
 
   getInventoryFiles() {

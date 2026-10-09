@@ -1,106 +1,49 @@
-<div class="inventory-screen">
-
-    <!-- Header -->
-    <div class="headers">
-        Inventory
-        <button type="button" class="load-btn" (click)="getInventoryFiles()">
-
-            📁 Sync OneDrive Files
-        </button>
+<div class="page page--wide">
+  <header class="page__head">
+    <div class="page__title">
+      <h1>Inventory</h1>
+      <p>
+        @if (tableData?.length) {
+          {{ tableData.length }} rows imported
+        } @else {
+          Connect a spreadsheet to see your stock here
+        }
+      </p>
     </div>
+    <button class="btn btn--secondary btn--sm" type="button" (click)="getInventoryFiles()">
+      <mat-icon>refresh</mat-icon>Sync OneDrive
+    </button>
+  </header>
 
-    <!-- Summary Cards -->
-    <div class="summary-cards-container">
-
-        <div class="card">
-            <div class="card-content">
-                <span class="card-title">Inventory Turnover</span>
-                <span class="card-value">₹ 0</span>
-                <span class="card-trend upward">
-                    ↑ 4.5%
-                    <span class="trend-text">vs last month</span>
-                </span>
-            </div>
-
-            <div class="card-icon">
-                <mat-icon>payments</mat-icon>
-            </div>
+  <div class="stack">
+    @if (!tableData?.length) {
+      <div class="card">
+        <p class="empty">
+          Nothing imported yet.<br />
+          Go to <strong>Data sources</strong> and connect Google Sheets or OneDrive.
+        </p>
+      </div>
+    } @else {
+      <div class="card" style="padding: 0; overflow: hidden">
+        <div class="table-scroll">
+          <table class="table">
+            <thead>
+              <tr>
+                @for (col of displayedColumns; track col) { <th>{{ col }}</th> }
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of tableData; track $index) {
+                <tr>
+                  @for (col of displayedColumns; track col) {
+                    <td [class.num]="isNumeric(row[col])">{{ row[col] }}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-
-        <div class="card">
-            <div class="card-content">
-                <span class="card-title">Total Inventory Value</span>
-                <span class="card-value">₹ 0</span>
-                <span class="card-trend downward">
-                    ↓ 1.2%
-                    <span class="trend-text">vs last month</span>
-                </span>
-            </div>
-
-            <div class="card-icon">
-                <mat-icon>money_off</mat-icon>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-content">
-                <span class="card-title">Dead Stock %</span>
-                <span class="card-value">₹ 0</span>
-                <span class="card-trend upward">
-                    ↑ 3.8%
-                    <span class="trend-text">vs last month</span>
-                </span>
-            </div>
-
-            <div class="card-icon">
-                <mat-icon>account_balance_wallet</mat-icon>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-content">
-                <span class="card-title">Stock Accuracy %</span>
-                <span class="card-value">0</span>
-                <span class="card-trend neutral">
-                    ↑ 0%
-                    <span class="trend-text">Current Month</span>
-                </span>
-            </div>
-
-            <div class="card-icon">
-                <mat-icon>assignment_ind</mat-icon>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Table Section -->
-    <mat-card class="table-card">
-
-        <div class="table-wrapper">
-
-            <table mat-table [dataSource]="tableData" class="custom-table">
-
-                <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
-
-                    <th mat-header-cell *matHeaderCellDef>
-                        {{ column }}
-                    </th>
-
-                    <td mat-cell *matCellDef="let row">
-                        {{ row[column] }}
-                    </td>
-
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-
-                <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-
-            </table>
-
-        </div>
-
-    </mat-card>
-
+      </div>
+    }
+  </div>
 </div>

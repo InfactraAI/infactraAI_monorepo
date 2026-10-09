@@ -1,25 +1,25 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global stylesheet. Screens compose the primitives defined here rather than
+   re-declaring buttons, cards and tables per feature.
+   See styles/_tokens.less for the rationale. */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Khula, sans-serif; overflow: hidden; }
+@import 'styles/_tokens.less';
+@import 'styles/_themes.less';
+@import 'styles/_base.less';
+@import 'styles/_components.less';
 
+/* Snackbars are rendered by Material into an overlay outside component
+   scope, so they have to live globally. */
 .success-snackbar {
-  background: #16a34a !important;
-  color: white !important;
+  --mdc-snackbar-container-color: var(--gain);
+  --mdc-snackbar-supporting-text-color: #fff;
 }
-
 .error-snackbar {
-  background: #dc2626 !important;
-  color: white !important;
+  --mdc-snackbar-container-color: var(--loss);
+  --mdc-snackbar-supporting-text-color: #fff;
 }
-
 .warning-snackbar {
-  background: #f59e0b !important;
-  color: black !important;
+  --mdc-snackbar-container-color: var(--warn);
+  --mdc-snackbar-supporting-text-color: #fff;
 }
 
-.cdk-global-scrollblock {
-    position: fixed;
-    width: 100%;
-    overflow-y: auto !important;
-}
+.cdk-global-scrollblock { position: fixed; width: 100%; overflow-y: auto !important; }

@@ -1,0 +1,32 @@
+<div class="ts" [class.is-open]="open()">
+  <button class="ts__fab" type="button" (click)="toggle()" [attr.aria-expanded]="open()" aria-controls="ts-panel">
+    <mat-icon>palette</mat-icon>
+    <span>{{ currentName() }}</span>
+  </button>
+
+  @if (open()) {
+    <div class="ts__panel" id="ts-panel" role="dialog" aria-label="Preview themes">
+      <div class="ts__head">
+        <strong>Preview themes</strong>
+        <span>Applies instantly on every page. Remembered in this browser.</span>
+      </div>
+
+      @for (g of groups; track g) {
+        <p class="ts__group">{{ g }}</p>
+        <div class="ts__grid">
+          @for (t of inGroup(g); track t.key) {
+            <button class="ts__opt" type="button"
+                    [class.is-on]="theme.current() === t.key"
+                    (click)="pick(t.key)" [attr.aria-pressed]="theme.current() === t.key">
+              <span class="ts__sw" [style.background]="t.swatch[1]">
+                <i [style.background]="t.swatch[2]"></i>
+                <b [style.background]="t.swatch[0]"></b>
+              </span>
+              <span class="ts__name">{{ t.name }}</span>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

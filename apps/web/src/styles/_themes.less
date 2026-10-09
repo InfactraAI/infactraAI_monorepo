@@ -1,0 +1,97 @@
+/* ============================================================================
+   Theme catalogue
+   ----------------------------------------------------------------------------
+   Each theme is eight or so decisions; everything else is derived so the
+   tints, hairlines and hover states stay consistent with one another. A theme
+   activates via data-theme on <html>, set by ThemeService.
+
+   Rule that every theme keeps: gain and loss are the only green and red in
+   the chrome. Where a brand hue lands near one of them, the semantic colour is
+   shifted, never the brand.
+   ========================================================================= */
+
+.theme(@name; @ground; @surface; @ink; @accent; @gain; @loss;
+       @warn: #8a5a00; @scheme: light;
+       @side-bg: @ground; @side-ink: mix(@ink, @ground, 78%); @side-muted: @accent;
+       @side-active-bg: @accent; @top-bg: @surface; @top-edge: @accent) {
+  :root[data-theme="@{name}"] {
+    color-scheme: @scheme;
+
+    --ground:   @ground;
+    --ground-2: mix(@ink, @ground, 6%);
+    --surface:  @surface;
+    --rule:     mix(@ink, @ground, 13%);
+    --rule-2:   mix(@ink, @ground, 7%);
+
+    --ink:   @ink;
+    --ink-2: mix(@ink, @ground, 78%);
+    --ink-3: mix(@ink, @ground, 56%);
+    --ink-4: mix(@ink, @ground, 38%);
+
+    --accent:       @accent;
+    --accent-hover: mix(@accent, @ink, 86%);
+    --accent-ink:   contrast(@accent, #0b1220, #ffffff, 55%);
+    --accent-sub:   mix(@accent, @surface, 12%);
+    --accent-line:  mix(@accent, @surface, 32%);
+
+    --gain:     @gain;  --gain-sub: mix(@gain, @surface, 12%);
+    --loss:     @loss;  --loss-sub: mix(@loss, @surface, 12%);
+    --warn:     @warn;  --warn-sub: mix(@warn, @surface, 12%);
+
+    --side-bg:         @side-bg;
+    --side-ink:        @side-ink;
+    --side-muted:      @side-muted;
+    --side-hover:      mix(@side-ink, @side-bg, 9%);
+    --side-active-bg:  @side-active-bg;
+    --side-active-ink: contrast(@side-active-bg, #0b1220, #ffffff, 55%);
+    --side-rule:       mix(@side-ink, @side-bg, 14%);
+
+    --top-bg:    @top-bg;
+    --top-ink:   contrast(@top-bg, @ink, #ffffff, 55%);
+    --top-muted: mix(contrast(@top-bg, @ink, #ffffff, 55%), @top-bg, 72%);
+    --top-rule:  mix(contrast(@top-bg, @ink, #ffffff, 55%), @top-bg, 14%);
+    --top-edge:  @top-edge;
+
+    --head-bg:   mix(@accent, @surface, 12%);
+    --head-ink:  @accent;
+    --head-line: mix(@accent, @surface, 32%);
+  }
+}
+
+/* ── Cool light ──────────────────────────────────────────────────────────── */
+.theme(cobalt;    #f3f5f9; #ffffff; #0a0a0a; #0033a0; #1a7f43; #c0281c);
+.theme(arctic;    #eef4f8; #ffffff; #0b1a24; #0369a1; #15803d; #b91c1c);
+.theme(cerulean;  #f2f7fb; #ffffff; #0d1b2a; #1d4ed8; #1a7f43; #c0281c);
+.theme(indigo;    #f5f5fb; #ffffff; #0e0e1a; #4338ca; #1a7f43; #c0281c);
+/* teal brand: gain darkened so it does not read as "another teal" */
+.theme(lagoon;    #eff7f6; #ffffff; #0b1a19; #0f766e; #166534; #c0281c);
+
+/* ── Warm light ──────────────────────────────────────────────────────────── */
+.theme(amber;     #f7f5f1; #ffffff; #161514; #b45309; #1a7f43; #c0281c; @side-active-bg: #161514; @top-edge: #161514);
+/* orange-red brand: loss moves to crimson to stay apart */
+.theme(terracotta;#faf5f0; #ffffff; #1c1410; #9a3412; #1a7f43; #be123c);
+.theme(saffron;   #fbf7ee; #ffffff; #1a1608; #a16207; #1a7f43; #c0281c);
+/* olive brand: gain moves to teal */
+.theme(olive;     #f5f6f0; #ffffff; #151a0e; #4d7c0f; #0e7c86; #c0281c);
+/* plum brand: loss brightened */
+.theme(ember;     #f8f5f4; #ffffff; #170f12; #7a1f3d; #1a7f43; #d92d20);
+/* rose brand: loss moves to orange */
+.theme(rosewood;  #faf4f5; #ffffff; #1a1012; #9f1239; #1a7f43; #c2410c);
+.theme(aubergine; #f6f3f8; #ffffff; #150f1a; #6b21a8; #1a7f43; #c0281c);
+
+/* ── Neutral light — colour lives only in the data ───────────────────────── */
+.theme(ink;       #f5f5f5; #ffffff; #0a0a0a; #0a0a0a; #1a7f43; #c0281c);
+.theme(paper;     #f4f1ea; #fffdf8; #1f1b16; #1f1b16; #2f6b3a; #b3261e);
+.theme(steel;     #eef0f3; #ffffff; #111827; #334155; #1a7f43; #c0281c);
+
+/* ── Dark rail, light content ────────────────────────────────────────────── */
+.theme(midnight;  #f3f5f9; #ffffff; #0a0a0a; #0033a0; #1a7f43; #c0281c;
+       @side-bg: #0b1f44; @side-ink: #c4cfe6; @side-muted: #7b8db3; @side-active-bg: #2457d6; @top-bg: #0b1f44; @top-edge: #2457d6);
+.theme(onyx;      #f7f5f1; #ffffff; #161514; #b45309; #1a7f43; #c0281c;
+       @side-bg: #141414; @side-ink: #d4d0c8; @side-muted: #8f8a80; @side-active-bg: #b45309; @top-bg: #141414);
+.theme(evergreen; #eff7f6; #ffffff; #0b1a19; #0f766e; #166534; #c0281c;
+       @side-bg: #0b2e2a; @side-ink: #bfe0da; @side-muted: #6fa89f; @side-active-bg: #0f766e; @top-bg: #0b2e2a);
+
+/* ── Dark ────────────────────────────────────────────────────────────────── */
+.theme(slate;     #0f1419; #171d26; #e6eaf0; #5b8def; #3ecf7a; #f0645a; @warn: #e0a441; @scheme: dark; @side-muted: #5b8def);
+.theme(carbon;    #0c0c0d; #16161a; #ececec; #f59e0b; #4ade80; #f87171; @warn: #fbbf24; @scheme: dark; @side-muted: #8a8a8a);

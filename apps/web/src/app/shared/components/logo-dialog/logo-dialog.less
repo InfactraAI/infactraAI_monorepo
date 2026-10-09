@@ -1,94 +1,32 @@
-.settings-page {
-    padding: 24px;
-    background: #f8fafc;
-    //   min-height: 100vh;
+/* Logo dialog — an overlay, so the one place a real shadow belongs.
+   Tokens: src/styles/_tokens.less */
+
+:host { display: block; }
+
+.logo-dialog { padding: var(--s5); }
+
+.logo-dialog__head { margin-bottom: var(--s5); }
+.logo-dialog__head h3 { font-size: var(--t-head); }
+.logo-dialog__head p { margin-top: var(--s2); color: var(--ink-3); font-size: var(--t-small); }
+
+.preview {
+  display: grid;
+  place-items: center;
+  height: 140px;
+  margin-bottom: var(--s4);
+  border: 1px dashed var(--rule);
+  border-radius: var(--r);
+  background: var(--ground);
+  overflow: hidden;
+
+  img { max-width: 80%; max-height: 100px; object-fit: contain; }
 }
 
-.settings-card {
-    max-width: 500px;
-    margin: auto;
-    background: white;
-    padding: 24px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.header {
-    text-align: center;
-}
-
-/* Logo */
-.logo-section {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.logo-preview img {
-    width: 120px;
-    height: 120px;
-    object-fit: contain;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-bottom: 10px;
-}
-
-.file-select {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.upload-btn {
-    margin-top: 10px;
-    padding: 8px 16px;
-    background: #1248D4;
-    color: white;
-    border: 2px solid #1248D4;
-    border-radius: 15px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-
-    &:hover {
-        background-color: transparent;
-        color: #656565;
-    }
-}
-
-/* Form */
-.form-group {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    font-size: 14px;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-}
-
-/* Footer */
-.footer {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.save-btn {
-    padding: 8px 16px;
-    background: #1248D4;
-    color: white;
-    border: 2px solid #1248D4;
-    border-radius: 15px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-
-    &:hover {
-        background-color: transparent;
-        color: #656565;
-    }
+.logo-dialog__actions {
+  display: flex;
+  gap: var(--s2);
+  justify-content: flex-end;
+  margin-top: var(--s5);
+  padding-top: var(--s4);
+  border-top: 1px solid var(--rule-2);
 }

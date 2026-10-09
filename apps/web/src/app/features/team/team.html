@@ -1,127 +1,115 @@
-<div class="gs-screen">
-
-  <div class="gs-header">
-    <mat-icon class="gs-logo-icon">groups</mat-icon>
-    <div class="gs-title">
-      <h2>Team</h2>
+<div class="page">
+  <header class="page__head">
+    <div class="page__title">
+      <h1>Team</h1>
       <p>{{ data?.organization?.name || 'Your organisation' }}</p>
     </div>
-  </div>
+  </header>
 
-  @if (loading) {
-    <div class="gs-card gs-empty"><p>Loading your team…</p></div>
-  } @else if (data) {
+  <div class="stack">
+    @if (loading) {
+      <div class="card"><p class="empty">Loading your team…</p></div>
+    } @else if (data) {
 
-    @if (data.canManage) {
-      <div class="gs-card">
-        <h3>Invite someone</h3>
-        <p class="lede">
-          They'll get a link to set their own password and join
-          <strong>{{ data.organization.name }}</strong>. Invitations expire in 7 days.
-        </p>
+      @if (data.canManage) {
+        <div class="card">
+          <div class="card__head">
+            <h3>Invite someone</h3>
+            <p>They'll get a link to set their own password and join
+               <strong>{{ data.organization.name }}</strong>. Invitations expire in 7 days.</p>
+          </div>
 
-        <div class="invite-row">
-          <input class="text-input" type="email" placeholder="name@company.com"
-                 [(ngModel)]="inviteEmail" (keyup.enter)="invite()" [disabled]="busy" />
-
-          <select class="text-input role-select" [(ngModel)]="inviteRole" [disabled]="busy">
-            <option value="USER">Member</option>
-            <option value="ADMIN">Admin</option>
-          </select>
-
-          <button class="btn-primary" type="button" (click)="invite()" [disabled]="busy || !inviteEmail.trim()">
-            <mat-icon>send</mat-icon>{{ busy ? 'Working…' : 'Send invite' }}
-          </button>
-        </div>
-
-        @if (!data.emailEnabled) {
-          <p class="fineprint warn">
-            Email isn't configured on this server, so invitations won't send automatically —
-            you'll get a link to share instead.
-          </p>
-        }
-
-        @if (manualLink) {
-          <div class="manual-link">
-            <div>
-              <strong>Share this link with {{ manualLink.email }}</strong>
-              <code>{{ manualLink.url }}</code>
-            </div>
-            <button class="btn-ghost" type="button" (click)="copyLink()">
-              <mat-icon>content_copy</mat-icon>Copy
+          <div class="invite-row">
+            <input class="input" type="email" placeholder="name@company.com"
+                   [(ngModel)]="inviteEmail" (keyup.enter)="invite()" [disabled]="busy" />
+            <select class="input invite-row__role" [(ngModel)]="inviteRole" [disabled]="busy">
+              <option value="USER">Member</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+            <button class="btn btn--primary" type="button" (click)="invite()"
+                    [disabled]="busy || !inviteEmail.trim()">
+              {{ busy ? 'Working…' : 'Send invite' }}
             </button>
           </div>
-        }
-      </div>
-    }
 
-    <div class="gs-card">
-      <h3>Members <span class="count">{{ data.members.length }}</span></h3>
+          @if (!data.emailEnabled) {
+            <p class="muted" style="margin-top: var(--s3); font-size: var(--t-small)">
+              Email isn't configured on this server, so you'll get a link to share instead.
+            </p>
+          }
 
-      <ul class="sheet-list">
+          @if (manualLink) {
+            <div class="notice notice--warn" style="margin-top: var(--s4)">
+              <div style="min-width:0; flex:1 1 auto">
+                <strong>Share this link with {{ manualLink.email }}</strong>
+                <code style="display:block; margin-top: var(--s2); overflow-wrap:anywhere; font-size: var(--t-small)">{{ manualLink.url }}</code>
+              </div>
+              <button class="btn btn--ghost btn--sm" type="button" (click)="copyLink()">
+                <mat-icon>content_copy</mat-icon>Copy
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="card">
+        <div class="card__head"><h3>Members <span class="tag">{{ data.members.length }}</span></h3></div>
+
         @for (m of data.members; track m.id) {
-          <li class="sheet-row">
-            <div class="member-main">
+          <div class="row">
+            <div class="row__main" style="display:flex; align-items:center; gap: var(--s3)">
               <span class="avatar">{{ initials(m.name) }}</span>
-              <div class="sheet-main">
-                <span class="sheet-title">
+              <div style="min-width:0">
+                <span class="truncate" style="display:block; font-weight:500">
                   {{ m.name }}
-                  @if (m.isOwner) { <span class="tag tag-owner">Owner</span> }
+                  @if (m.isOwner) { <span class="tag">Owner</span> }
                   @else if (m.role === 'ADMIN') { <span class="tag">Admin</span> }
                 </span>
-                <span class="sheet-meta">{{ m.email }}</span>
+                <span class="muted truncate" style="display:block; font-size: var(--t-small)">{{ m.email }}</span>
               </div>
             </div>
 
             @if (data.canManage && !m.isOwner) {
-              <div class="sheet-actions">
-                <button class="btn-ghost" type="button" (click)="toggleRole(m)" [disabled]="busy">
+              <div class="row__actions">
+                <button class="btn btn--ghost btn--sm" type="button" (click)="toggleRole(m)" [disabled]="busy">
                   {{ m.role === 'ADMIN' ? 'Make member' : 'Make admin' }}
                 </button>
-                <button class="btn-ghost danger" type="button" (click)="remove(m)" [disabled]="busy">
+                <button class="btn btn--ghost btn--sm btn--danger" type="button" (click)="remove(m)" [disabled]="busy">
                   <mat-icon>person_remove</mat-icon>
                 </button>
               </div>
             }
-          </li>
+          </div>
         }
-      </ul>
-    </div>
+      </div>
 
-    @if (data.invitations.length) {
-      <div class="gs-card">
-        <h3>Pending invitations <span class="count">{{ data.invitations.length }}</span></h3>
+      @if (data.invitations.length) {
+        <div class="card">
+          <div class="card__head"><h3>Pending invitations <span class="tag">{{ data.invitations.length }}</span></h3></div>
 
-        <ul class="sheet-list">
           @for (i of data.invitations; track i.id) {
-            <li class="sheet-row" [class.has-error]="i.expired">
-              <div class="sheet-main">
-                <span class="sheet-title">{{ i.email }}</span>
-                <span class="sheet-meta">
-                  <span class="tag tag-soft">{{ i.role === 'ADMIN' ? 'Admin' : 'Member' }}</span>
-                  @if (i.expired) {
-                    <span class="expired">Expired</span>
-                  } @else {
-                    <span>expires {{ i.expiresAt | date: 'd MMM' }}</span>
-                  }
+            <div class="row">
+              <div class="row__main">
+                <span class="truncate" style="display:block; font-weight:500">{{ i.email }}</span>
+                <span class="status" [class.status--error]="i.expired">
+                  <span class="tag">{{ i.role === 'ADMIN' ? 'Admin' : 'Member' }}</span>
+                  @if (i.expired) { Expired } @else { expires {{ i.expiresAt | date: 'd MMM' }} }
                 </span>
               </div>
-
               @if (data.canManage) {
-                <div class="sheet-actions">
-                  <button class="btn-ghost" type="button" (click)="resend(i)" [disabled]="busy">
+                <div class="row__actions">
+                  <button class="btn btn--ghost btn--sm" type="button" (click)="resend(i)" [disabled]="busy">
                     <mat-icon>refresh</mat-icon>Resend
                   </button>
-                  <button class="btn-ghost danger" type="button" (click)="revoke(i)" [disabled]="busy">
+                  <button class="btn btn--ghost btn--sm btn--danger" type="button" (click)="revoke(i)" [disabled]="busy">
                     <mat-icon>close</mat-icon>
                   </button>
                 </div>
               }
-            </li>
+            </div>
           }
-        </ul>
-      </div>
+        </div>
+      }
     }
-  }
-
+  </div>
 </div>

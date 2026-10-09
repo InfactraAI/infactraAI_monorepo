@@ -1,80 +1,47 @@
-<h3 class="section-title">
-    Desktop tools
-    @if(selectedSource === 'Tally'){
-    <span class="breadcrumb">
-        <mat-icon class="arrow-icon">chevron_right</mat-icon>
-        {{ selectedSource }}
-    </span>
+<div class="page">
+  <header class="page__head">
+    <button class="btn btn--ghost btn--sm" type="button" (click)="goBack()" aria-label="Back">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="page__title">
+      <h1>Tally</h1>
+      <p>Connect to a Tally instance running on your network.</p>
+    </div>
+    @if (tallyConnected) {
+      <span class="status status--on"><span class="status__dot"></span>Reachable</span>
     }
-</h3>
-<div class="connector-page">
+  </header>
 
-    <!-- Top Bar -->
-    <div class="top-bar">
-        <button class="back-btn" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-            Back
-        </button>
-    </div>
+  <div class="stack">
+    <div class="card">
+      <div class="card__head">
+        <h3>Connection</h3>
+        <p>Tally must be running with XML/HTTP enabled, and reachable from this server.</p>
+      </div>
 
-    <!-- Center Wrapper -->
-    <div class="form-wrapper">
+      <div class="form-grid">
+        <label class="field">
+          <span class="field__label">Host</span>
+          <input class="input" type="text" [(ngModel)]="form.host" placeholder="localhost" />
+        </label>
+        <label class="field">
+          <span class="field__label">Port</span>
+          <input class="input" type="text" [(ngModel)]="form.port" placeholder="9000" />
+        </label>
+      </div>
 
-        <!-- Form Card -->
-        <div class="form-card">
+      <div style="display:flex; gap: var(--s2); margin-top: var(--s5)">
+        <button class="btn btn--secondary" type="button" (click)="testConnection()">Test connection</button>
+        <button class="btn btn--primary" type="button" (click)="save()">Sync ledgers</button>
+      </div>
 
-            <!-- Connection Name -->
-            <label>Connection Name <span class="required">*</span></label>
-            <input type="text" placeholder="e.g. Tally Main DB" [(ngModel)]="form.name" />
-
-            <!-- Host -->
-            <label>Host <span class="required">*</span></label>
-            <input type="text" placeholder="localhost or 192.168.1.10" [(ngModel)]="form.host" />
-
-            <!-- Port -->
-            <label>Port <span class="required">*</span></label>
-            <input type="text" placeholder="9000" [(ngModel)]="form.port" />
-
-            <!-- Company -->
-            <label>Company Name <span class="required">*</span></label>
-            <input type="text" placeholder="ABC Pvt Ltd" [(ngModel)]="form.company" />
-
-            <!-- Authentication -->
-            <label>Authentication</label>
-            <select [(ngModel)]="form.authType">
-                <option value="none">No Authentication</option>
-                <option value="basic">Username & Password</option>
-            </select>
-
-            <!-- Conditional fields -->
-            <div *ngIf="form.authType === 'basic'">
-                <label>Username</label>
-                <input type="text" [(ngModel)]="form.username" />
-
-                <label>Password</label>
-                <input type="password" [(ngModel)]="form.password" />
-            </div>
-
-            <!-- Optional Fields -->
-            <div class="optional">
-                <span (click)="toggleOptional()">
-                    <mat-icon>{{ showOptional ? 'expand_more' : 'chevron_right' }}</mat-icon>
-                    Optional fields
-                </span>
-            </div>
-
-            <div *ngIf="showOptional">
-                <label>Sync Interval (mins)</label>
-                <input type="number" placeholder="15" [(ngModel)]="form.syncInterval" />
-            </div>
-
-            <!-- Footer -->
-            <div class="form-footer">
-                <button class="test-btn" (click)="testConnection()">Test Connection</button>
-                <button class="save-btn" (click)="save()">Test & Save</button>
-            </div>
-
+      <div class="notice" style="margin-top: var(--s5)">
+        <mat-icon>info</mat-icon>
+        <div>
+          Testing only checks that Tally answers — nothing is stored, so this
+          connector does not appear as connected on the Data sources page.
         </div>
+      </div>
     </div>
-
+  </div>
 </div>

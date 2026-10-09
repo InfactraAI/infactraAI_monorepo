@@ -1,0 +1,43 @@
+/* Paints from the live tokens so it belongs to whichever theme is active. */
+
+.ts { position: fixed; right: 16px; bottom: 16px; z-index: 1000; font-family: var(--font-ui); }
+
+.ts__fab {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 36px; padding: 0 14px 0 10px;
+  border: 1px solid var(--rule); border-radius: 999px;
+  background: var(--surface); color: var(--ink);
+  font: inherit; font-size: var(--t-small); font-weight: 500; cursor: pointer;
+  box-shadow: var(--shadow-overlay);
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--accent); }
+}
+
+.ts__panel {
+  position: absolute; right: 0; bottom: 44px;
+  width: 360px; max-width: calc(100vw - 32px); max-height: 70vh; overflow: auto;
+  padding: var(--s3) var(--s4) var(--s4);
+  border: 1px solid var(--rule); border-radius: var(--r-lg);
+  background: var(--surface); color: var(--ink);
+  box-shadow: var(--shadow-overlay);
+}
+
+.ts__head { display: grid; gap: 2px; padding-bottom: var(--s3); border-bottom: 1px solid var(--rule-2); margin-bottom: var(--s2);
+  strong { font-size: var(--t-body); } span { color: var(--ink-3); font-size: var(--t-micro); } }
+
+.ts__group { margin: var(--s3) 0 var(--s2); color: var(--ink-3); font-size: var(--t-micro); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+
+.ts__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s2); }
+
+.ts__opt {
+  display: grid; gap: 5px; padding: 6px; border: 1px solid var(--rule); border-radius: var(--r);
+  background: var(--surface); color: var(--ink-2); font: inherit; font-size: 11px; cursor: pointer; text-align: left;
+  &:hover { border-color: var(--ink-4); }
+  &.is-on { border-color: var(--accent); background: var(--accent-sub); color: var(--accent); font-weight: 600; }
+}
+
+/* swatch: page ground with a sidebar stripe and a brand block */
+.ts__sw { position: relative; display: block; height: 30px; border-radius: 3px; overflow: hidden; border: 1px solid rgba(0,0,0,.08);
+  i { position: absolute; inset: 0 auto 0 0; width: 26%; }
+  b { position: absolute; right: 5px; bottom: 5px; width: 34%; height: 8px; border-radius: 2px; } }
+
+.ts__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

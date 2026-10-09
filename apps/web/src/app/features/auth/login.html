@@ -1,268 +1,144 @@
+<div class="auth">
+  <div class="auth__card">
+    <p class="auth__mark">Infactra</p>
 
-<div class="login-wrapper">
+    <!-- ── SIGN IN ───────────────────────────────────────────────────── -->
+    @if (mode === 'login') {
+      <h2>Sign in</h2>
+      <p class="muted auth__lede">Financial intelligence for your organisation.</p>
 
-  <mat-card class="login-card">
+      <div class="auth__fields">
+        <label class="field">
+          <span class="field__label">Email</span>
+          <input class="input" type="email" [(ngModel)]="email" name="email" autocomplete="username" />
+        </label>
 
-    <!-- LOGIN FORM -->
-
-    <ng-container *ngIf="mode === 'login'">
-
-      <h2 class="login-title">Log in</h2>
-
-      <form>
-
-        <div class="field-group">
-
-          <label class="field-label">
-            Username or Email
-          </label>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <input matInput type="email" [(ngModel)]="email" name="email" required />
-          </mat-form-field>
-
-        </div>
-
-        <div class="field-group">
-
-          <div class="password-header">
-
-            <label class="field-label">
-              Password
-            </label>
-
-            <span class="show-password" (click)="hidePassword = !hidePassword">
+        <label class="field">
+          <span class="field__label auth__label-row">
+            Password
+            <button type="button" class="link" (click)="hidePassword = !hidePassword">
               {{ hidePassword ? 'Show' : 'Hide' }}
-            </span>
+            </button>
+          </span>
+          <input class="input" [type]="hidePassword ? 'password' : 'text'"
+                 [(ngModel)]="password" name="password" autocomplete="current-password"
+                 (keyup.enter)="login()" />
+        </label>
+      </div>
 
-          </div>
+      <button class="btn btn--primary btn--block" type="button" (click)="login()"
+              style="margin-top: var(--s5)">Sign in</button>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="password" name="password"
-              required />
-          </mat-form-field>
+      <div class="auth__foot">
+        <button type="button" class="link" (click)="toggleMode('forgot')">Forgot password?</button>
+        <button type="button" class="link" (click)="toggleMode('register')">Create an organisation</button>
+      </div>
+    }
 
-        </div>
+    <!-- ── REGISTER ──────────────────────────────────────────────────── -->
+    @if (mode === 'register') {
+      <h2>Create an organisation</h2>
+      <p class="muted auth__lede">You'll be its first admin and can invite your team afterwards.</p>
 
-        <div class="remember-row">
-          <input type="checkbox" />
-          <span>Keep me logged in</span>
-        </div>
+      <div class="auth__fields">
+        <label class="field">
+          <span class="field__label">Organisation name</span>
+          <input class="input" type="text" [(ngModel)]="organizationName" name="organizationName"
+                 placeholder="Acme Exports Pvt Ltd" />
+        </label>
 
-        <button type="button" mat-raised-button class="login-btn" (click)="login()">
-          Log in
-        </button>
+        <label class="field">
+          <span class="field__label">Your name</span>
+          <input class="input" type="text" [(ngModel)]="name" name="name" placeholder="Jane Doe" />
+        </label>
 
-        <div class="form-footer">
+        <label class="field">
+          <span class="field__label">Email</span>
+          <input class="input" type="email" [(ngModel)]="email" name="email" autocomplete="username" />
+        </label>
 
-          <button type="button" class="link-btn" (click)="toggleMode('forgot')">
-            Forgot password?
-          </button>
+        <label class="field">
+          <span class="field__label">Mobile</span>
+          <input class="input" type="text" [(ngModel)]="mobile" name="mobile" />
+        </label>
 
-          <button type="button" class="link-btn" (click)="toggleMode('register')">
-            Create account
-          </button>
-
-        </div>
-
-      </form>
-
-    </ng-container>
-
-    <!-- REGISTER FORM -->
-
-    <ng-container *ngIf="mode === 'register'">
-
-      <h2 class="login-title">
-        Create account
-      </h2>
-
-      <p class="subtitle">
-        Create your account to continue
-      </p>
-
-      <form>
-
-        <div class="field-group">
-
-          <label class="field-label">
-            Full Name
-          </label>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <input matInput type="text" [(ngModel)]="name" name="name" placeholder="Enter your name" required />
-          </mat-form-field>
-
-        </div>
-
-        <div class="field-group">
-
-          <label class="field-label">
-            Organisation Name
-          </label>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <input matInput type="text" [(ngModel)]="organizationName" name="organizationName"
-                   placeholder="Your company or workspace name" required />
-          </mat-form-field>
-
-        </div>
-
-        <div class="field-group">
-
-          <label class="field-label">
-            Mobile Number
-          </label>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <input matInput type="text" [(ngModel)]="mobile" name="mobile" placeholder="Enter mobile number" required />
-          </mat-form-field>
-
-        </div>
-
-        <div class="field-group">
-
-          <label class="field-label">
-            Email Address
-          </label>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <input matInput type="email" [(ngModel)]="email" name="email" placeholder="Enter your email" required />
-          </mat-form-field>
-
-        </div>
-
-        <div class="field-group">
-
-          <label class="field-label">
-            Address
-          </label>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <input matInput type="text" [(ngModel)]="address" name="address" placeholder="Enter address" />
-          </mat-form-field>
-
-        </div>
-
-        <div class="field-group">
-
-          <div class="password-header">
-
-            <label class="field-label">
-              Password
-            </label>
-
-            <span class="show-password" (click)="hidePassword = !hidePassword">
+        <label class="field">
+          <span class="field__label auth__label-row">
+            Password
+            <button type="button" class="link" (click)="hidePassword = !hidePassword">
               {{ hidePassword ? 'Show' : 'Hide' }}
-            </span>
-
-          </div>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="password" name="password"
-              placeholder="Create password" required />
-          </mat-form-field>
-
-        </div>
-
-        <div class="field-group">
-
-          <label class="field-label">
-            Confirm Password
-          </label>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="confirmPassword"
-              name="confirmPassword" placeholder="Confirm password" required />
-          </mat-form-field>
-
-        </div>
-
-        <button type="button" mat-raised-button class="login-btn register-btn" (click)="register()">
-          Create Account
-        </button>
-
-        <div class="form-footer">
-
-          <span>
-            Already have an account?
+            </button>
           </span>
+          <input class="input" [type]="hidePassword ? 'password' : 'text'"
+                 [(ngModel)]="password" name="password" autocomplete="new-password" />
+        </label>
 
-          <button type="button" class="link-btn" (click)="toggleMode('login')">
-            Log in
-          </button>
+        <label class="field">
+          <span class="field__label">Confirm password</span>
+          <input class="input" [type]="hidePassword ? 'password' : 'text'"
+                 [(ngModel)]="confirmPassword" name="confirmPassword" (keyup.enter)="register()" />
+        </label>
+      </div>
 
-        </div>
+      <button class="btn btn--primary btn--block" type="button" (click)="register()"
+              style="margin-top: var(--s5)">Create organisation</button>
 
-      </form>
+      <div class="auth__foot">
+        <button type="button" class="link" (click)="toggleMode('login')">Back to sign in</button>
+      </div>
+    }
 
-    </ng-container>
+    <!-- ── FORGOT ────────────────────────────────────────────────────── -->
+    @if (mode === 'forgot') {
+      <h2>Reset password</h2>
+      <p class="muted auth__lede">We'll email you a link. It expires in 15 minutes.</p>
 
+      <div class="auth__fields">
+        <label class="field">
+          <span class="field__label">Email</span>
+          <input class="input" type="email" [(ngModel)]="email" name="forgotEmail"
+                 (keyup.enter)="sendResetLink()" />
+        </label>
+      </div>
 
-    <!-- FORGOT PASSWORD FORM -->
+      <button class="btn btn--primary btn--block" type="button" (click)="sendResetLink()"
+              style="margin-top: var(--s5)">Send reset link</button>
 
-    <ng-container *ngIf="mode === 'forgot'">
+      <div class="auth__foot">
+        <button type="button" class="link" (click)="toggleMode('login')">Back to sign in</button>
+      </div>
+    }
 
-      <h2 class="login-title">
-        Forgot password
-      </h2>
+    <!-- ── RESET — reachable from the emailed link ───────────────────── -->
+    @if (mode === 'reset') {
+      <h2>Choose a new password</h2>
+      <p class="muted auth__lede">Set a new password for your account.</p>
 
-      <p class="subtitle">
-        Enter your email address associated with your account to recover your password.
-      </p>
-
-      <form>
-
-        <!-- EMAIL -->
-
-        <div class="field-group">
-
-          <label class="field-label">
-            Email Address
-          </label>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <input matInput type="email" [(ngModel)]="email" name="forgotEmail" placeholder="Enter your email"
-              required />
-          </mat-form-field>
-
-        </div>
-
-        <!-- BUTTON -->
-
-        <button type="button" mat-raised-button class="login-btn register-btn" (click)="sendResetLink()">
-          Reset Password
-        </button>
-
-        <!-- FOOTER -->
-
-        <div class="form-footer">
-
-          <span>
-            Remember your password?
+      <div class="auth__fields">
+        <label class="field">
+          <span class="field__label auth__label-row">
+            New password
+            <button type="button" class="link" (click)="hidePassword = !hidePassword">
+              {{ hidePassword ? 'Show' : 'Hide' }}
+            </button>
           </span>
+          <input class="input" [type]="hidePassword ? 'password' : 'text'"
+                 [(ngModel)]="password" name="password" autocomplete="new-password" />
+        </label>
 
-          <button type="button" class="link-btn" (click)="toggleMode('login')">
-            Back to login
-          </button>
+        <label class="field">
+          <span class="field__label">Confirm password</span>
+          <input class="input" [type]="hidePassword ? 'password' : 'text'"
+                 [(ngModel)]="confirmPassword" name="confirmPassword" (keyup.enter)="resetPassword()" />
+        </label>
+      </div>
 
-        </div>
+      <button class="btn btn--primary btn--block" type="button" (click)="resetPassword()"
+              style="margin-top: var(--s5)">Update password</button>
 
-      </form>
-
-    </ng-container>
-
-
-
-  </mat-card>
-
+      <div class="auth__foot">
+        <button type="button" class="link" (click)="toggleMode('login')">Back to sign in</button>
+      </div>
+    }
+  </div>
 </div>
-
-
-
-
-
-
-
-
-

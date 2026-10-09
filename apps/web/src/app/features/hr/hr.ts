@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -8,13 +8,7 @@ import { OneDriveService } from '../../core/services/onedrive.service';
 @Component({
   selector: 'app-hr-ai',
   standalone: true,
-  imports: [
-    MatTableModule,
-    RouterLink,
-    RouterOutlet,
-    RouterLinkActive,
-    FormsModule
-  ],
+  imports: [RouterLink, RouterOutlet, RouterLinkActive, FormsModule, MatIconModule],
   templateUrl: './hr.html',
   styleUrl: './hr.less',
 })

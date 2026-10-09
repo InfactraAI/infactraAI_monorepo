@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { MatTableModule } from '@angular/material/table';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-reconciliation',
   standalone: true,
-  imports: [MatTableModule],
+  imports: [CommonModule],
   templateUrl: './reconciliation.html',
   styleUrl: './reconciliation.less',
 })

@@ -7,10 +7,20 @@ import { catchError, forkJoin, of } from 'rxjs';
 import { GoogleSheetsService } from '../../core/services/google-sheets.service';
 import { OneDriveService } from '../../core/services/onedrive.service';
 
-interface SourceState {
-  connected: boolean;
-  detail: string;
+interface Connector {
+  key: string;
+  name: string;
+  icon: string;
+  group: string;
+  /** Built and usable. Everything else is a placeholder. */
+  live: boolean;
+  route?: string;
+  /** Filled from the API for connectors that persist a connection. */
+  connected?: boolean;
+  detail?: string;
 }
+
+const GROUPS = ['Files & spreadsheets', 'Accounting', 'Warehouses', 'Analytics', 'Commerce'];
 
 @Component({
   selector: 'app-configuration',
@@ -21,14 +31,27 @@ interface SourceState {
 })
 export class Configuration implements OnInit {
   loading = true;
+  groups = GROUPS;
 
   /**
-   * Real connection state, read from the API rather than set on click.
-   * Only sources with a persisted connection can report one — Tally is a
-   * one-shot reachability test with nothing stored, so it never shows here.
+   * The catalogue, as data. Previously fourteen near-identical blocks of
+   * markup plus eight booleans that were set on click and read by nothing.
    */
-  googleSheets: SourceState = { connected: false, detail: '' };
-  oneDrive: SourceState = { connected: false, detail: '' };
+  connectors: Connector[] = [
+    { key: 'sheets',   name: 'Google Sheets', icon: 'googlesheet.png', group: 'Files & spreadsheets', live: true, route: '/google-sheets-config' },
+    { key: 'onedrive', name: 'OneDrive',      icon: 'onedrive.png',    group: 'Files & spreadsheets', live: true, route: '/one-drive-config' },
+    { key: 'tally',    name: 'Tally',         icon: 'tally.png',       group: 'Accounting',           live: true, route: '/tally-config' },
+    { key: 'zoho',     name: 'Zoho Books',    icon: 'zoho.png',        group: 'Accounting',           live: false },
+    { key: 'bigquery', name: 'BigQuery',      icon: 'BigQuery.png',    group: 'Warehouses',           live: false },
+    { key: 'postgres', name: 'Postgres',      icon: 'postgresql.jpg',  group: 'Warehouses',           live: false },
+    { key: 'mysql',    name: 'MySQL',         icon: 'mysql.png',       group: 'Warehouses',           live: false },
+    { key: 'oracle',   name: 'Oracle DB',     icon: 'oracle.png',      group: 'Warehouses',           live: false },
+    { key: 'mixpanel', name: 'Mixpanel',      icon: 'mixpanel.png',    group: 'Analytics',            live: false },
+    { key: 'ga',       name: 'Google Analytics', icon: 'analytics.png', group: 'Analytics',           live: false },
+    { key: 'zohocrm',  name: 'Zoho CRM',      icon: 'zoho-crm.png',    group: 'Commerce',             live: false },
+    { key: 'salesforce', name: 'Salesforce',  icon: 'salesforce.webp', group: 'Commerce',             live: false },
+    { key: 'amazon',   name: 'Amazon Seller', icon: 'amazon.png',      group: 'Commerce',             live: false },
+  ];
 
   constructor(
     private router: Router,
@@ -36,11 +59,9 @@ export class Configuration implements OnInit {
     private onedrive: OneDriveService
   ) {}
 
-  ngOnInit(): void {
-    this.refresh();
-  }
+  ngOnInit(): void { this.refresh(); }
 
-  /** One request per connector; a failure just leaves that card disconnected. */
+  /** One request per connector that persists state; a failure just leaves it disconnected. */
   refresh(): void {
     this.loading = true;
 
@@ -48,27 +69,29 @@ export class Configuration implements OnInit {
       google: this.sheets.status().pipe(catchError(() => of(null))),
       drives: this.onedrive.getOneDrives().pipe(catchError(() => of(null))),
     }).subscribe(({ google, drives }) => {
+      const sheets = this.connectors.find((c) => c.key === 'sheets')!;
       if (google?.connected) {
         const n = google.sheets?.length || 0;
-        this.googleSheets = {
-          connected: true,
-          detail: n ? `${google.email} · ${n} sheet${n > 1 ? 's' : ''}` : (google.email ?? ''),
-        };
+        sheets.connected = true;
+        sheets.detail = n ? `${google.email} · ${n} sheet${n > 1 ? 's' : ''}` : (google.email ?? '');
       }
 
       const list = drives?.oneDrives || [];
+      const od = this.connectors.find((c) => c.key === 'onedrive')!;
       if (list.length) {
-        this.oneDrive = {
-          connected: true,
-          detail: list.map((d: any) => d.email).filter(Boolean).join(', '),
-        };
+        od.connected = true;
+        od.detail = list.map((d: any) => d.email).filter(Boolean).join(', ');
       }
 
       this.loading = false;
     });
   }
 
-  connectTally()       { this.router.navigate(['/tally-config']); }
-  connectOneDrive()    { this.router.navigate(['/one-drive-config']); }
-  connectGoogleSheet() { this.router.navigate(['/google-sheets-config']); }
+  inGroup(group: string): Connector[] {
+    return this.connectors.filter((c) => c.group === group);
+  }
+
+  open(c: Connector): void {
+    if (c.route) this.router.navigate([c.route]);
+  }
 }

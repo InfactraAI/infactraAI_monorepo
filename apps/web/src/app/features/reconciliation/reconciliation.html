@@ -1,28 +1,29 @@
-<!-- Net Current Assets -->
-<div class="headers">Net Current Reconciliation (fig in Cr)</div>
-<div class="modern-table-wrapper table-scroll">
+<div class="page">
+  <header class="page__head">
+    <div class="page__title">
+      <h1>Reconciliation</h1>
+      <p>Net current assets · figures in ₹ crore</p>
+    </div>
+    <span class="tag">Sample data</span>
+  </header>
 
-    <table mat-table [dataSource]="netCurrentAssetsData" class="modern-table" sticky>
-
-        <!-- Particulars -->
-        <ng-container matColumnDef="particulars">
-            <th mat-header-cell *matHeaderCellDef>Particulars</th>
-            <td mat-cell *matCellDef="let row" [class.total]="row.total">
-                {{ row.particulars }}
-            </td>
-        </ng-container>
-
-        <!-- Mar-25 -->
-        <ng-container matColumnDef="mar25">
-            <th mat-header-cell *matHeaderCellDef>Dec-25</th>
-            <td mat-cell *matCellDef="let row" [class.total]="row.total">
-                {{ row.mar25 }}
-            </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedNcaColumns ;sticky:true" class="particular-col-3rd-table">
-        </tr>
-        <tr mat-row *matRowDef="let row; columns: displayedNcaColumns"></tr>
-
-    </table>
+  <div class="stack">
+    <div class="card" style="padding: 0; overflow: hidden">
+      <table class="table">
+        <thead>
+          <tr><th>Particulars</th><th class="num">Dec-25</th></tr>
+        </thead>
+        <tbody>
+          @for (row of netCurrentAssetsData; track row.particulars) {
+            <tr [class.is-total]="row.total">
+              <td>{{ row.particulars }}</td>
+              <td class="num" [class.val--loss]="row.mar25 < 0" [class.val--gain]="row.total && row.mar25 > 0">
+                {{ row.mar25 | number: '1.2-2' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

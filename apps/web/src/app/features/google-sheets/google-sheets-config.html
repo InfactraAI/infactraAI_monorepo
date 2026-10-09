@@ -1,203 +1,173 @@
-<div class="gs-screen">
+<div class="page">
 
-  <!-- HEADER -->
-  <div class="gs-header">
-    <button class="back-btn" type="button" (click)="goBack()" aria-label="Go back">
+  <header class="page__head">
+    <button class="btn btn--ghost btn--sm" type="button" (click)="goBack()" aria-label="Back">
       <mat-icon>arrow_back</mat-icon>
     </button>
 
-    <img src="assets/icons/googlesheet.png" class="gs-logo" alt="" />
-
-    <div class="gs-title">
-      <h2>Google Sheets</h2>
-      <p>Import a spreadsheet straight from your Google Drive.</p>
+    <div class="page__title">
+      <h1>Google Sheets</h1>
+      <p>Import a spreadsheet from your Google Drive.</p>
     </div>
 
     @if (status?.connected) {
-      <span class="badge badge-ok"><span class="dot"></span>Connected</span>
+      <span class="status status--on"><span class="status__dot"></span>Connected</span>
     }
-  </div>
+  </header>
 
-  @if (loading) {
-    <div class="gs-card gs-empty">
-      <p>Checking your Google connection…</p>
-    </div>
-  }
+  <div class="stack">
 
-  <!-- SERVER NOT CONFIGURED -->
-  @if (!loading && status && !status.configured) {
-    <div class="gs-card gs-warn">
-      <mat-icon>info</mat-icon>
-      <div>
-        <h3>Google Sheets isn't set up on this server yet</h3>
-        <p>
-          An administrator needs to add a Google OAuth client to the API environment
-          — <code>GOOGLE_CLIENT_ID</code>, <code>GOOGLE_CLIENT_SECRET</code>,
-          <code>GOOGLE_REDIRECT_URI</code>, <code>GOOGLE_API_KEY</code> and
-          <code>GOOGLE_PROJECT_NUMBER</code>. This is a one-time step for the whole
-          install; people using the app never handle a credential.
-        </p>
-      </div>
-    </div>
-  }
+    @if (loading) {
+      <div class="card"><p class="empty">Checking your Google connection…</p></div>
+    }
 
-  <!-- NOT CONNECTED -->
-  @if (!loading && status?.configured && !status?.connected) {
-    <div class="gs-card gs-connect">
-      <h3>Connect your Google account</h3>
-      <p class="lede">
-        You'll approve once on Google's own screen, then pick the spreadsheets you want.
-        Infactra only ever sees the files you pick — nothing else in your Drive.
-      </p>
-
-      <button class="btn-google" type="button" (click)="connect()" [disabled]="busy">
-        <svg class="g-mark" viewBox="0 0 48 48" aria-hidden="true">
-          <path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.2-.4-4.7H24v8.9h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.1-3.8 6.6-9.4 6.6-16.3z"/>
-          <path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.2l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.2 15.5 46 24 46z"/>
-          <path fill="#FBBC05" d="M11.8 28.4c-.4-1.3-.7-2.7-.7-4.4s.3-3 .7-4.4v-5.7H4.5C2.9 17.1 2 20.4 2 24s.9 6.9 2.5 10.1l7.3-5.7z"/>
-          <path fill="#EA4335" d="M24 10.5c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 3.9 29.9 2 24 2 15.5 2 8.1 6.8 4.5 13.9l7.3 5.7c1.7-5.2 6.5-9.1 12.2-9.1z"/>
-        </svg>
-        Continue with Google
-      </button>
-
-      <p class="fineprint">
-        Read-only. Uses the <code>drive.file</code> scope, so access is granted per
-        file at the moment you pick it.
-      </p>
-    </div>
-  }
-
-  <!-- CONNECTED -->
-  @if (!loading && status?.connected) {
-
-    <div class="gs-card gs-account">
-      <div class="account-line">
-        <mat-icon>account_circle</mat-icon>
+    <!-- NOT CONFIGURED -->
+    @if (!loading && status && !status.configured) {
+      <div class="notice notice--warn">
+        <mat-icon>info</mat-icon>
         <div>
-          <strong>{{ status?.email }}</strong>
-          <span>Google account</span>
+          <h4>Google Sheets isn't set up on this server</h4>
+          <p style="margin-top: var(--s2)">
+            An administrator needs to add a Google OAuth client to the API environment.
+            This is a one-time step for the whole install — people using Infactra never
+            handle a credential.
+          </p>
         </div>
       </div>
-      <button class="btn-ghost danger" type="button" (click)="disconnect()" [disabled]="busy">
-        Disconnect
-      </button>
-    </div>
+    }
 
-    <!-- ADD A SHEET -->
-    <div class="gs-card">
-      <h3>Import a spreadsheet</h3>
-      <p class="lede">
-        Two steps: choose where the data should land inside Infactra, then pick the
-        spreadsheet from your Google Drive.
-      </p>
-
-      <p class="step-label"><span class="step-num">1</span> Where should this data go?</p>
-
-      <div class="dept-row">
-        @for (d of departments; track d.key) {
-          <label class="dept-option"
-                 [class.selected]="selectedDepartment === d.key && d.available"
-                 [class.unavailable]="!d.available">
-            <input type="radio" name="department" [value]="d.key"
-                   [disabled]="!d.available" [(ngModel)]="selectedDepartment" />
-            <span class="dept-name">
-              {{ d.label }}
-              @if (!d.available) { <span class="pill">Not yet</span> }
-            </span>
-            <span class="dept-feeds">{{ d.feeds }}</span>
-            @if (d.available && sheetFor(d.key); as existing) {
-              <span class="dept-warn">Will replace “{{ existing.title }}”</span>
-            }
-          </label>
-        }
-      </div>
-
-      <p class="step-label"><span class="step-num">2</span> Which spreadsheet?</p>
-
-      <div class="url-row">
-        <input class="text-input" type="url" [(ngModel)]="sheetUrl" [disabled]="busy"
-               (keyup.enter)="importFromUrl()"
-               placeholder="Paste a Google Sheets link…" />
-        <button class="btn-primary" type="button" (click)="importFromUrl()"
-                [disabled]="busy || !sheetUrl.trim()">
-          {{ busy ? 'Working…' : 'Import' }}
+    <!-- NOT CONNECTED -->
+    @if (!loading && status?.configured && !status?.connected) {
+      <div class="card" style="text-align: center; padding: var(--s7) var(--s5)">
+        <h3>Connect your Google account</h3>
+        <p class="muted" style="max-width: 44ch; margin: var(--s3) auto var(--s5); line-height: var(--lh-snug)">
+          Approve once on Google's screen, then choose the spreadsheets you want.
+          Infactra only ever reads the sheets you pick.
+        </p>
+        <button class="btn btn--primary" type="button" (click)="connect()" [disabled]="busy">
+          Continue with Google
         </button>
       </div>
-      <p class="fineprint">Open the sheet in Google and copy the URL from the address bar.</p>
+    }
 
-      <div class="or-divider"><span>or</span></div>
+    <!-- CONNECTED -->
+    @if (!loading && status?.connected) {
 
-      <button class="btn-ghost wide" type="button" (click)="openPicker()" [disabled]="busy">
-        <mat-icon>folder_open</mat-icon> Browse Google Drive
-      </button>
-      <p class="fineprint">
-        Opens Google's own file picker. If it shows a 403, your browser is blocking
-        third-party cookies — paste the link instead.
-      </p>
-    </div>
+      <div class="card">
+        <div class="row">
+          <div class="row__main">
+            <span class="truncate" style="display:block; font-weight:500">{{ status?.email }}</span>
+            <span class="muted" style="font-size: var(--t-small)">Google account</span>
+          </div>
+          <div class="row__actions">
+            <button class="btn btn--ghost btn--sm btn--danger" type="button"
+                    (click)="disconnect()" [disabled]="busy">Disconnect</button>
+          </div>
+        </div>
+      </div>
 
-    <!-- TAB CHOOSER -->
-    @if (pendingPick) {
-      <div class="gs-card gs-tabpick">
-        <h3>Which tab?</h3>
-        <p class="lede">“{{ pendingPick.title }}” has {{ pendingPick.tabs.length }} tabs.</p>
+      <div class="card">
+        <div class="card__head">
+          <h3>Import a spreadsheet</h3>
+          <p>Choose where the data should land, then point us at the sheet.</p>
+        </div>
 
-        <div class="tab-list">
-          @for (t of pendingPick.tabs; track t.title) {
-            <label class="tab-option" [class.selected]="pendingPick.chosen === t.title">
-              <input type="radio" name="tab" [value]="t.title" [(ngModel)]="pendingPick.chosen" />
-              <span>{{ t.title }}</span>
+        <p class="field__label">Destination</p>
+        <div class="choice-grid">
+          @for (d of departments; track d.key) {
+            <label class="choice"
+                   [class.is-selected]="selectedDepartment === d.key && d.available"
+                   [class.is-disabled]="!d.available">
+              <input type="radio" name="department" [value]="d.key"
+                     [disabled]="!d.available" [(ngModel)]="selectedDepartment" />
+              <span class="choice__name">
+                {{ d.label }}
+                @if (!d.available) { <span class="tag">Not yet</span> }
+              </span>
+              <span class="choice__note">{{ d.feeds }}</span>
+              @if (d.available && sheetFor(d.key); as existing) {
+                <span class="choice__note" style="color: var(--warn)">Replaces “{{ existing.title }}”</span>
+              }
             </label>
           }
         </div>
 
-        <div class="actions">
-          <button class="btn-primary" type="button" (click)="confirmTab()" [disabled]="busy">Import</button>
-          <button class="btn-ghost" type="button" (click)="cancelTab()">Cancel</button>
+        <p class="field__label" style="margin-top: var(--s5)">Spreadsheet</p>
+        <div class="url-row">
+          <input class="input" type="url" [(ngModel)]="sheetUrl" [disabled]="busy"
+                 (keyup.enter)="importFromUrl()" placeholder="Paste a Google Sheets link…" />
+          <button class="btn btn--primary" type="button" (click)="importFromUrl()"
+                  [disabled]="busy || !sheetUrl.trim()">{{ busy ? 'Working…' : 'Import' }}</button>
         </div>
+        <p class="muted" style="margin-top: var(--s2); font-size: var(--t-small)">
+          Open the sheet in Google and copy the URL from the address bar.
+        </p>
+
+        <div class="divider" style="margin: var(--s5) 0 var(--s4)"><span>or</span></div>
+
+        <button class="btn btn--secondary btn--block" type="button" (click)="openPicker()" [disabled]="busy">
+          <mat-icon>folder_open</mat-icon> Browse Google Drive
+        </button>
+        <p class="muted" style="margin-top: var(--s2); font-size: var(--t-small)">
+          Opens Google's own file picker. If it shows a 403, your browser is blocking
+          third-party cookies — paste the link instead.
+        </p>
       </div>
-    }
 
-    <!-- CONNECTED SHEETS -->
-    <div class="gs-card">
-      <h3>Imported sheets</h3>
+      <!-- TAB CHOOSER -->
+      @if (pendingPick) {
+        <div class="card" style="border-color: var(--ink)">
+          <div class="card__head">
+            <h3>Which tab?</h3>
+            <p>“{{ pendingPick.title }}” has {{ pendingPick.tabs.length }} tabs.</p>
+          </div>
+          <div class="choice-grid">
+            @for (t of pendingPick.tabs; track t.title) {
+              <label class="choice" [class.is-selected]="pendingPick.chosen === t.title">
+                <input type="radio" name="tab" [value]="t.title" [(ngModel)]="pendingPick.chosen" />
+                <span class="choice__name">{{ t.title }}</span>
+              </label>
+            }
+          </div>
+          <div style="display:flex; gap: var(--s2); margin-top: var(--s4)">
+            <button class="btn btn--primary" type="button" (click)="confirmTab()" [disabled]="busy">Import</button>
+            <button class="btn btn--ghost" type="button" (click)="cancelTab()">Cancel</button>
+          </div>
+        </div>
+      }
 
-      @if (!status?.sheets?.length) {
-        <p class="lede muted">Nothing imported yet.</p>
-      } @else {
-        <ul class="sheet-list">
+      <!-- IMPORTED -->
+      <div class="card">
+        <div class="card__head"><h3>Imported sheets</h3></div>
+
+        @if (!status?.sheets?.length) {
+          <p class="empty">Nothing imported yet.</p>
+        } @else {
           @for (s of status?.sheets; track s.id) {
-            <li class="sheet-row" [class.has-error]="s.lastSyncStatus === 'error'">
-              <div class="sheet-main">
-                <span class="sheet-title">{{ s.title }}</span>
-                <span class="sheet-meta">
+            <div class="row">
+              <div class="row__main">
+                <span class="truncate" style="display:block; font-weight:500">{{ s.title }}</span>
+                <span class="status" [class.status--error]="s.lastSyncStatus === 'error'">
                   <span class="tag">{{ departmentLabel(s.department) }}</span>
-                  @if (s.sheetName) { <span class="tag tag-soft">{{ s.sheetName }}</span> }
-                  <span>{{ s.rowCount }} rows</span>
-                  @if (s.lastSyncedAt) {
-                    <span>· synced {{ s.lastSyncedAt | date: 'd MMM, h:mm a' }}</span>
-                  }
+                  {{ s.rowCount }} rows
+                  @if (s.lastSyncedAt) { · synced {{ s.lastSyncedAt | date: 'd MMM, h:mm a' }} }
                 </span>
                 @if (s.lastSyncStatus === 'error') {
-                  <span class="sheet-error">
-                    <mat-icon>error_outline</mat-icon>{{ s.lastSyncError }}
-                  </span>
+                  <span class="status status--error" style="margin-top: var(--s1)">{{ s.lastSyncError }}</span>
                 }
               </div>
-
-              <div class="sheet-actions">
-                <button class="btn-ghost" type="button" (click)="sync(s)" [disabled]="busy">
+              <div class="row__actions">
+                <button class="btn btn--ghost btn--sm" type="button" (click)="sync(s)" [disabled]="busy">
                   <mat-icon>refresh</mat-icon>Sync
                 </button>
-                <button class="btn-ghost danger" type="button" (click)="remove(s)" [disabled]="busy">
+                <button class="btn btn--ghost btn--sm btn--danger" type="button" (click)="remove(s)" [disabled]="busy">
                   <mat-icon>delete_outline</mat-icon>
                 </button>
               </div>
-            </li>
+            </div>
           }
-        </ul>
-      }
-    </div>
-  }
-
+        }
+      </div>
+    }
+  </div>
 </div>

@@ -1,84 +1,78 @@
-<div class="gs-screen">
-
-  <div class="gs-header">
-    <button class="back-btn" type="button" (click)="goBack()" aria-label="Go back">
+<div class="page">
+  <header class="page__head">
+    <button class="btn btn--ghost btn--sm" type="button" (click)="goBack()" aria-label="Back">
       <mat-icon>arrow_back</mat-icon>
     </button>
-
-    <img src="assets/icons/onedrive.png" class="gs-logo" alt="" />
-
-    <div class="gs-title">
-      <h2>OneDrive</h2>
+    <div class="page__title">
+      <h1>OneDrive</h1>
       <p>Import an Excel workbook from your Microsoft account.</p>
     </div>
-  </div>
+    @if (drives.length) {
+      <span class="status status--on"><span class="status__dot"></span>Connected</span>
+    }
+  </header>
 
-  @if (loading) {
-    <div class="gs-card gs-empty"><p>Checking your OneDrive connections…</p></div>
-  } @else {
+  <div class="stack">
+    @if (loading) {
+      <div class="card"><p class="empty">Checking your OneDrive connections…</p></div>
+    } @else {
+      <div class="card">
+        <div class="card__head">
+          <h3>Connect a folder</h3>
+          <p>Choose where the data should land, then sign in. Infactra looks for a
+             OneDrive folder named after the destination and imports the first
+             workbook inside it.</p>
+        </div>
 
-    <div class="gs-card">
-      <h3>Connect a folder</h3>
-      <p class="lede">
-        Pick where the data should land, then sign in with Microsoft. Infactra looks for a
-        Drive folder named after the department and imports the first workbook inside it.
-      </p>
+        <p class="field__label">Destination</p>
+        <div class="choice-grid">
+          @for (d of departments; track d.key) {
+            <label class="choice"
+                   [class.is-selected]="selectedDepartment === d.key && d.available"
+                   [class.is-disabled]="!d.available">
+              <input type="radio" name="department" [value]="d.key"
+                     [disabled]="!d.available" [(ngModel)]="selectedDepartment" />
+              <span class="choice__name">
+                {{ d.label }}
+                @if (!d.available) { <span class="tag">Not yet</span> }
+              </span>
+              <span class="choice__note">{{ d.feeds }}</span>
+              @if (d.available && driveFor(d.key); as drive) {
+                <span class="choice__note">Connected as {{ drive.email }}</span>
+              }
+            </label>
+          }
+        </div>
 
-      <p class="step-label"><span class="step-num">1</span> Where should this data go?</p>
-
-      <div class="dept-row">
-        @for (d of departments; track d.key) {
-          <label class="dept-option"
-                 [class.selected]="selectedDepartment === d.key && d.available"
-                 [class.unavailable]="!d.available">
-            <input type="radio" name="department" [value]="d.key"
-                   [disabled]="!d.available" [(ngModel)]="selectedDepartment" />
-            <span class="dept-name">
-              {{ d.label }}
-              @if (!d.available) { <span class="pill">Not yet</span> }
-            </span>
-            <span class="dept-feeds">{{ d.feeds }}</span>
-            @if (d.available && driveFor(d.key); as drive) {
-              <span class="dept-warn">Connected as {{ drive.email }}</span>
-            }
-          </label>
-        }
+        <button class="btn btn--primary" type="button" (click)="connect()" [disabled]="busy"
+                style="margin-top: var(--s5)">
+          {{ busy ? 'Working…' : 'Continue with Microsoft' }}
+        </button>
       </div>
 
-      <p class="step-label"><span class="step-num">2</span> Sign in to Microsoft</p>
-
-      <button class="btn-primary" type="button" (click)="connect()" [disabled]="busy">
-        <mat-icon>link</mat-icon>
-        {{ busy ? 'Working…' : 'Continue with Microsoft' }}
-      </button>
-    </div>
-
-    <div class="gs-card">
-      <h3>Connected accounts</h3>
-
-      @if (!drives.length) {
-        <p class="lede muted">Nothing connected yet.</p>
-      } @else {
-        <ul class="sheet-list">
+      <div class="card">
+        <div class="card__head"><h3>Connected accounts</h3></div>
+        @if (!drives.length) {
+          <p class="empty">Nothing connected yet.</p>
+        } @else {
           @for (d of drives; track d.accountId) {
-            <li class="sheet-row">
-              <div class="sheet-main">
-                <span class="sheet-title">{{ d.email }}</span>
-                <span class="sheet-meta">
+            <div class="row">
+              <div class="row__main">
+                <span class="truncate" style="display:block; font-weight:500">{{ d.email }}</span>
+                <span class="status">
                   <span class="tag">{{ d.department }}</span>
-                  @if (d.active) { <span class="tag tag-soft">active</span> }
+                  @if (d.active) { active }
                 </span>
               </div>
-              <div class="sheet-actions">
-                <button class="btn-ghost" type="button" (click)="sync(d.department)" [disabled]="busy">
+              <div class="row__actions">
+                <button class="btn btn--ghost btn--sm" type="button" (click)="sync(d.department)" [disabled]="busy">
                   <mat-icon>refresh</mat-icon>Sync
                 </button>
               </div>
-            </li>
+            </div>
           }
-        </ul>
-      }
-    </div>
-  }
-
+        }
+      </div>
+    }
+  </div>
 </div>

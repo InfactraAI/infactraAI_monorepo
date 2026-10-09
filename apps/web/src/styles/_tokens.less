@@ -1,0 +1,114 @@
+/* ============================================================================
+   Infactra Design Tokens
+   ----------------------------------------------------------------------------
+   Principles borrowed from the Audi CI (styleguide.audi.com), applied to a
+   data product. The assets are Audi's; the discipline is general:
+
+     1. Space separates, not lines. A rule appears only when space is scarce.
+     2. Every surface has a function. No decorative containers.
+     3. Hierarchy comes from size and contrast, not colour.
+     4. Flat. Shadow signals elevation only — overlays and sticky headers.
+     5. Right angles. Radius is near-zero, never pill-shaped chrome.
+     6. Typography carries the page.
+
+   The one addition of our own: CHROME IS MONOCHROME. In a financial product
+   the colour budget belongs to the data — green and red must mean gain and
+   loss, never "this is a button". So actions are near-black, and hue is
+   reserved for meaning.
+   ========================================================================= */
+
+:root {
+  /* ── Neutrals — true greys, no blue cast ──────────────────────────────── */
+  --ink:        #0a0a0a;   /* primary text, primary action            */
+  --ink-2:      #3d3d3d;   /* secondary text                          */
+  --ink-3:      #6e6e6e;   /* tertiary text, captions                 */
+  --ink-4:      #9b9b9b;   /* placeholder, disabled                   */
+  --rule:       #dde3ee;   /* hairline, cool-tinted to match ground   */
+  --rule-2:     #eaeef5;   /* faintest division                       */
+  --surface:    #ffffff;   /* card, panel — white on a tinted ground  */
+  --ground:     #f3f5f9;   /* page background: cool, not grey         */
+  --ground-2:   #e9edf5;   /* recessed / hover                        */
+
+  /* ── Brand — carries actions and selection, nothing else ──────────────── */
+  --accent:      #0033a0;   /* deep blue: confident, clear of gain/loss */
+  --accent-hover:#002878;
+  --accent-ink:  #ffffff;
+  --accent-sub:  #e6ecf9;   /* tint: selected states, table headers    */
+  --accent-line: #c3d0ec;   /* accent at hairline weight               */
+
+  /* ── Shell — sidebar, topbar and table heads ───────────────────────────
+     Given their own tokens so a theme can paint a dark navigation rail
+     against light content without touching the general palette. Defaults
+     follow the page. */
+  --side-bg:        var(--ground);
+  --side-ink:       var(--ink-2);
+  --side-muted:     var(--accent);     /* group labels */
+  --side-hover:     var(--ground-2);
+  --side-active-bg: var(--accent);
+  --side-active-ink:var(--accent-ink);
+  --side-rule:      var(--rule);
+  --top-bg:         var(--surface);
+  --top-ink:        var(--ink);
+  --top-muted:      var(--ink-2);
+  --top-rule:       var(--rule);
+  --top-edge:       var(--accent);
+  --head-bg:        var(--accent-sub);
+  --head-ink:       var(--accent);
+  --head-line:      var(--accent-line);
+
+  /* ── Semantic — reserved for DATA, never for chrome ───────────────────── */
+  --gain:       #1a7f43;
+  --gain-sub:   #e9f5ee;
+  --loss:       #c0281c;
+  --loss-sub:   #fbeceb;
+  --warn:       #8a5a00;
+  --warn-sub:   #fdf4e3;
+
+  /* ── Type scale — 7 steps, replacing 23 ad-hoc sizes ──────────────────── */
+  --t-display:  2.25rem;   /* 36 — page title, once per screen        */
+  --t-title:    1.5rem;    /* 24 — section head                       */
+  --t-head:     1.125rem;  /* 18 — card head                          */
+  --t-body-lg:  0.9375rem; /* 15 — lede                               */
+  --t-body:     0.875rem;  /* 14 — default                            */
+  --t-small:    0.8125rem; /* 13 — secondary                          */
+  --t-micro:    0.6875rem; /* 11 — labels, uppercase                  */
+
+  --lh-tight:   1.15;
+  --lh-snug:    1.35;
+  --lh-normal:  1.6;
+
+  /* Extended width for headings — the Audi-Type-Extended idea, via a
+     variable-width open font rather than a licensed one. */
+  --font-display: 'Archivo', 'Inter', system-ui, sans-serif;
+  --font-ui:      'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:    ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* ── Space — 4px base ─────────────────────────────────────────────────── */
+  --s1: 4px;  --s2: 8px;   --s3: 12px;  --s4: 16px;
+  --s5: 24px; --s6: 32px;  --s7: 48px;  --s8: 64px;
+
+  /* ── Radius — right angles, softened barely ───────────────────────────── */
+  --r-sm: 2px;
+  --r:    4px;
+  --r-lg: 6px;
+
+  /* ── Elevation — only for things that genuinely float ─────────────────── */
+  --shadow-sticky: 0 1px 3px rgba(0, 0, 0, .06);
+  --shadow-overlay: 0 12px 32px rgba(0, 0, 0, .14);
+
+  /* ── Motion ───────────────────────────────────────────────────────────── */
+  --ease: cubic-bezier(.2, 0, .1, 1);
+  --fast: 120ms;
+  --med:  200ms;
+
+  /* ── Layout ───────────────────────────────────────────────────────────── */
+  /* 880 was a prose measure — right for an article, wrong for an app. It
+     left a third of a wide screen empty. Settings screens still get a cap so
+     inputs don't stretch absurdly; data screens go fluid. */
+  --measure: 1120px;
+  --sidebar: 212px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --fast: 0ms; --med: 0ms; }
+}

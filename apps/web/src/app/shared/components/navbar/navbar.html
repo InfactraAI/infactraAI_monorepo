@@ -1,125 +1,65 @@
-<header class="top-nav">
-    <div class="left">
-        <span class="app-name">
-            <img style="width: 158px; height: 40px; margin: 0.5rem 1.3rem 0 1.3rem; align-items: center;justify-content: center;"
-                [src]="logoUrl" alt="logo">
-        </span>
-        <!-- <mat-icon class="add-icon" matTooltip="Add Logo" (click)="addLogo()">add</mat-icon> -->
+<header class="topbar">
+  <div class="topbar__brand">
+    @if (logoUrl) {
+      <img class="topbar__logo" [src]="logoUrl" alt="" (error)="logoUrl = ''" />
+    } @else {
+      <span class="topbar__wordmark">Infactra</span>
+    }
+  </div>
 
-        <span class="v-divider"></span>
+  <span class="topbar__org truncate">{{ orgName || companyName }}</span>
 
-        <span class="env">{{ orgName || 'Demo environment' }}</span>
-        <div><span class="status">
-                ●
-            </span> <span class="status-text">
-                System ready
-            </span></div>
+  <span class="status status--on"><span class="status__dot"></span>System ready</span>
+
+  <div class="topbar__right">
+    <button class="btn btn--ghost btn--sm" type="button" matTooltip="Company logo" (click)="addLogo()">
+      <mat-icon>add_photo_alternate</mat-icon>
+    </button>
+
+    <div class="topbar__user">
+      <span class="topbar__avatar">{{ (name || 'U').charAt(0).toUpperCase() }}</span>
+      <span class="topbar__name truncate">{{ name || 'User' }}</span>
     </div>
-    
 
-    <div class="right">
-        <div class="user">
-            <span class="avatar">U</span>
-             <mat-icon class="add-icon" matTooltip="Add Logo" (click)="addLogo()">add</mat-icon>
-            <div style="display: flex; flex-direction: column; align-items: center">
-                <span class="User">User</span>
-                <span>{{ name }}</span>
-            </div>
-            <button mat-icon-button class="logout-btn" matTooltip="Logout" (click)="logout()">
-                <mat-icon>logout</mat-icon>
-            </button>
-        </div>
-    </div>
+    <button class="btn btn--ghost btn--sm" type="button" matTooltip="Sign out" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </div>
 </header>
 
+<div class="shell">
+  <nav class="sidebar">
+    <a class="navlink" routerLink="/dashboard" routerLinkActive="is-active">
+      <mat-icon>home</mat-icon><span>Dashboard</span>
+    </a>
+    <a class="navlink" routerLink="/ask-fireai" routerLinkActive="is-active">
+      <mat-icon>smart_toy</mat-icon><span>Ask AI</span>
+    </a>
 
-<div class="app-body">
-    <aside class="sidebar">
+    <p class="navgroup">Reporting</p>
+    <a class="navlink" routerLink="/mis" routerLinkActive="is-active">
+      <mat-icon>dashboard</mat-icon><span>MIS</span>
+    </a>
+    <a class="navlink" routerLink="/inventory" routerLinkActive="is-active">
+      <mat-icon>inventory_2</mat-icon><span>Inventory</span>
+    </a>
+    <a class="navlink" routerLink="/hr-ai" routerLinkActive="is-active">
+      <mat-icon>badge</mat-icon><span>HR</span>
+    </a>
+    <a class="navlink" routerLink="/reconciliation" routerLinkActive="is-active">
+      <mat-icon>account_balance</mat-icon><span>Reconciliation</span>
+    </a>
 
-        <div class="nav-section">
-            <button class="nav-item active" routerLink="/dashboard" routerLinkActive="active"
-                [class.active]="activeNav === 'dashboard'" (click)="setActive('dashboard')">
-                <mat-icon style="font-size: 21px;">home</mat-icon>
-                <span>Dashboard</span>
-            </button>
-        </div>
+    <p class="navgroup">Workspace</p>
+    <a class="navlink" routerLink="/configuration" [class.is-active]="isConfigActive()">
+      <mat-icon>settings</mat-icon><span>Data sources</span>
+    </a>
+    <a class="navlink" routerLink="/team" routerLinkActive="is-active">
+      <mat-icon>group</mat-icon><span>Team</span>
+    </a>
+  </nav>
 
-<div class="nav-divider"></div>
-
-        <div class="nav-section">
-            <button class="nav-item nav-title" routerLink="ask-fireai" routerLinkActive="active">
-                <span class="nav-title-text">
-                    <mat-icon>smart_toy</mat-icon>
-                    askAI
-                </span>
-            </button>
-        </div>
-
-
-        <div class="nav-divider"></div>
-
-        <div class="nav-section">
-            <button class="nav-item nav-title active" routerLink="/mis" routerLinkActive="active"
-                [class.active]="activeNav === 'mis'" (click)="setActive('mis')">
-                <span class="nav-title-text">
-                    <mat-icon>dashboard</mat-icon>
-                    MIS</span>
-            </button>
-        </div>
-
-        <div class="nav-divider"></div>
-
-        <div class="nav-section">
-            <button class="nav-item nav-title active" routerLink="/hr-ai" routerLinkActive="active"
-                [class.active]="activeNav === 'hr-ai'" (click)="setActive('hr-ai')">
-                <span class="nav-title-text">
-                    <mat-icon>account_tree</mat-icon>Hr Ai</span>
-            </button>
-        </div>
-
-
-        <div class="nav-divider"></div>
-
-        <div class="nav-section">
-            <button class="nav-item nav-title active" routerLink="/inventory" routerLinkActive="active"
-                [class.active]="activeNav === 'inventory'" (click)="setActive('inventory')">
-                <span class="nav-title-text">
-                    <mat-icon>stacked_bar_chart</mat-icon>Inventory</span>
-            </button>
-        </div>
-
-        <div class="nav-divider"></div>
-
-        <div class="nav-section">
-            <button class="nav-item nav-title active" routerLink="/reconciliation" routerLinkActive="active"
-                [class.active]="activeNav === 'reconciliation'" (click)="setActive('reconciliation')">
-                <span class="nav-title-text">
-                    <mat-icon>account_balance</mat-icon>Reconciliation</span>
-            </button>
-        </div>
-
-        <div class="nav-divider"></div>
-
-        <div class="nav-section">
-            <button class="nav-item nav-title" routerLink="/configuration" [class.active]="isConfigActive()">
-                <mat-icon>settings</mat-icon>
-                Configuration
-            </button>
-        </div>
-
-        <div class="nav-divider"></div>
-
-        <div class="nav-section">
-            <button class="nav-item nav-title" routerLink="/team" routerLinkActive="active"
-                [class.active]="activeNav === 'team'" (click)="setActive('team')">
-                <span class="nav-title-text">
-                    <mat-icon>groups</mat-icon>Team</span>
-            </button>
-        </div>
-        
-    </aside>
-
-    <main [ngClass]="activeNav === 'dashboard'? 'main-content': 'mis-content'">
-        <router-outlet></router-outlet>
-    </main>
+  <main class="shell__main">
+    <router-outlet></router-outlet>
+  </main>
 </div>

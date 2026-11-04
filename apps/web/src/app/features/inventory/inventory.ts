@@ -29,7 +29,7 @@ export class InventoryComponent implements OnInit {
   /** Right-align numeric cells so columns of figures line up. */
   isNumeric(v: unknown): boolean {
     if (v === null || v === undefined || v === '') return false;
-    return !isNaN(Number(String(v).replace(/[,\s₹$]/g, '')));
+    return !isNaN(Number(String(v).replace(/[,\sAED$]/g, '')));
   }
 
   getInventoryFiles() {

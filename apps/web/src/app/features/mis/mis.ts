@@ -21,10 +21,10 @@ export class MisComponent {
   ];
 
   kpis = [
-    { label: 'Net Profit', value: '₹4,24,404', trend: '↑ 97% MAR-24', color: '#6366f1', icon: 'ti-trending-up' },
-    { label: 'Gross Profit', value: '₹4,25,504', trend: '↑ 98% MAR-24', color: '#10b981', icon: 'ti-coin' },
-    { label: 'EBITDA', value: '₹4,24,604', trend: '↑ 97% MAR-24', color: '#f59e0b', icon: 'ti-report-analytics' },
-    { label: 'APR Net', value: '-₹30,241', trend: '↓ -727% APR-24', color: '#ef4444', icon: 'ti-trending-down', isNegative: true },
+    { label: 'Net Profit', value: 'AED4,24,404', trend: '↑ 97% MAR-26', color: '#6366f1', icon: 'ti-trending-up' },
+    { label: 'Gross Profit', value: 'AED4,25,504', trend: '↑ 98% MAR-26', color: '#10b981', icon: 'ti-coin' },
+    { label: 'EBITDA', value: 'AED4,24,604', trend: '↑ 97% MAR-26', color: '#f59e0b', icon: 'ti-report-analytics' },
+    { label: 'APR Net', value: '-AED30,241', trend: '↓ -727% APR-26', color: '#ef4444', icon: 'ti-trending-down', isNegative: true },
   ];
 
   plRows = [

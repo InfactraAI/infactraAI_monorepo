@@ -133,12 +133,12 @@ export class AskAi implements AfterViewChecked {
 
     return {
       role: 'ai',
-      text: `Here's the **last ${n} days sales data**.\nTotal: ₹${total.toLocaleString('en-IN')} | Avg/day: ₹${avg.toLocaleString('en-IN')}`,
+      text: `Here's the **last ${n} days sales data**.\nTotal: AED${total.toLocaleString('en-IN')} | Avg/day: AED${avg.toLocaleString('en-IN')}`,
       chart: {
         type: 'bar',
         data: {
           labels: days,
-          datasets: [{ label: 'Sales (₹)', data: sales, backgroundColor: BLUE, borderRadius: 6 }],
+          datasets: [{ label: 'Sales (AED)', data: sales, backgroundColor: BLUE, borderRadius: 6 }],
         },
         options: baseOpts(`Last ${n} Days — Sales`),
       },
@@ -159,8 +159,8 @@ export class AskAi implements AfterViewChecked {
         data: {
           labels: months,
           datasets: [
-            { label: 'This Year (₹)', data: rev,  borderColor: BLUE,  backgroundColor: 'rgba(37,99,235,0.1)', fill: true, tension: 0.4 },
-            { label: 'Last Year (₹)', data: prev, borderColor: GREEN, backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.4 },
+            { label: 'This Year (AED)', data: rev,  borderColor: BLUE,  backgroundColor: 'rgba(37,99,235,0.1)', fill: true, tension: 0.4 },
+            { label: 'Last Year (AED)', data: prev, borderColor: GREEN, backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.4 },
           ],
         },
         options: baseOpts('Monthly Revenue — FY 2025-26'),
@@ -183,7 +183,7 @@ export class AskAi implements AfterViewChecked {
         type: 'bar',
         data: {
           labels: top,
-          datasets: [{ label: 'Revenue (₹)', data: vals, backgroundColor: colors.slice(0, n), borderRadius: 6 }],
+          datasets: [{ label: 'Revenue (AED)', data: vals, backgroundColor: colors.slice(0, n), borderRadius: 6 }],
         },
         options: { ...baseOpts(`Top ${n} Products by Revenue`), indexAxis: 'y' as any },
       },
@@ -247,9 +247,9 @@ export class AskAi implements AfterViewChecked {
         data: {
           labels: weeks,
           datasets: [
-            { label: 'Inflow (₹)',  data: inflow,  backgroundColor: GREEN,  borderRadius: 4 },
-            { label: 'Outflow (₹)', data: outflow, backgroundColor: RED,    borderRadius: 4 },
-            { label: 'Net (₹)',     data: net,      backgroundColor: ORANGE, borderRadius: 4, type: 'line' as any, borderColor: ORANGE, fill: false },
+            { label: 'Inflow (AED)',  data: inflow,  backgroundColor: GREEN,  borderRadius: 4 },
+            { label: 'Outflow (AED)', data: outflow, backgroundColor: RED,    borderRadius: 4 },
+            { label: 'Net (AED)',     data: net,      backgroundColor: ORANGE, borderRadius: 4, type: 'line' as any, borderColor: ORANGE, fill: false },
           ],
         },
         options: baseOpts('Cash Flow — Last 8 Weeks'),

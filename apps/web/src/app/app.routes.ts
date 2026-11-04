@@ -24,7 +24,7 @@ export const routes: Routes = [
   {
     path: '',
     component: TopNavbar,
-    canActivate: [authGuard],
+   // canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: AdminDashboard },
@@ -48,5 +48,5 @@ export const routes: Routes = [
       { path: 'ask-fireai', component: AskAi },
     ],
   },
-  { path: '**', component: LoginComponent },
+  { path: '**', component: AdminDashboard },
 ];

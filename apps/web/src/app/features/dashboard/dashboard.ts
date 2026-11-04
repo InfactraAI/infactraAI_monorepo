@@ -46,14 +46,14 @@ export class AdminDashboard implements OnInit {
   ];
 
   snapshotCards = [
-    { title: 'Net Profit',   value: '₹ 4.25 Cr',  change: '3.2%',  subtitle: ' vs yesterday',  color: 'blue',   icon: 'attach_money'   },
+    { title: 'Net Profit',   value: 'AED 4.25 Cr',  change: '3.2%',  subtitle: ' vs yesterday',  color: 'blue',   icon: 'attach_money'   },
     { title: 'Cash Profit',  value: '37 weeks',    change: '+2 wks', subtitle: ' vs last month', color: 'green',  icon: 'calendar_today' },
-    { title: 'EBIDTA',       value: '₹ 73.50 L',  change: '8.5%',  subtitle: ' vs last week',  color: 'orange', icon: 'error_outline'  },
-    { title: 'Gross Profit', value: '₹ 61.45 L',  change: '12.3%', subtitle: ' vs last week',  color: 'purple', icon: 'email'          },
-    { title: 'Sales',        value: '₹ 18,20,000', change: '5.1%', subtitle: 'vs last week',   color: 'teal',   icon: 'payments'       },
-    { title: 'Receivables',  value: '₹ 12,80,000', change: '2.4%', subtitle: 'vs last week',   color: 'pink',   icon: 'credit_card'    },
-    { title: 'Purchase',     value: '₹ 12,467',   change: '9%',    subtitle: 'vs last month',  color: 'indigo', icon: 'description'    },
-    { title: 'Payables',     value: '₹ 96,990/mo', change: '1.2%', subtitle: 'vs last month',  color: 'lime',   icon: 'currency_rupee' }
+    { title: 'EBIDTA',       value: 'AED 73.50 L',  change: '8.5%',  subtitle: ' vs last week',  color: 'orange', icon: 'error_outline'  },
+    { title: 'Gross Profit', value: 'AED 61.45 L',  change: '12.3%', subtitle: ' vs last week',  color: 'purple', icon: 'email'          },
+    { title: 'Sales',        value: 'AED 18,20,000', change: '5.1%', subtitle: 'vs last week',   color: 'teal',   icon: 'payments'       },
+    { title: 'Receivables',  value: 'AED 12,80,000', change: '2.4%', subtitle: 'vs last week',   color: 'pink',   icon: 'credit_card'    },
+    { title: 'Purchase',     value: 'AED 12,467',   change: '9%',    subtitle: 'vs last month',  color: 'indigo', icon: 'description'    },
+    { title: 'Payables',     value: 'AED 96,990/mo', change: '1.2%', subtitle: 'vs last month',  color: 'lime',   icon: 'currency_rupee' }
   ];
 
   barChartType: ChartType = 'bar';
@@ -138,7 +138,7 @@ export class AdminDashboard implements OnInit {
           label: (context) => {
             const value = context.raw as number;
             const label = context.dataset.label || '';
-            return `${label}: ₹${Math.abs(value).toLocaleString()}`;
+            return `${label}: AED${Math.abs(value).toLocaleString()}`;
           },
           labelTextColor: (context) => {
             const label = context.dataset.label;

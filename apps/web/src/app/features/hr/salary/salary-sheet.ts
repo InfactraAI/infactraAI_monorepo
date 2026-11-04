@@ -68,7 +68,7 @@ export class SalarySheetComponent implements OnInit {
   salarySnapshots = [
     {
       title: 'Gross Salary',
-      value: '₹ 0',
+      value: 'AED 0',
       icon: 'payments',
       color: 'blue',
       change: '4.5%',
@@ -78,7 +78,7 @@ export class SalarySheetComponent implements OnInit {
 
     {
       title: 'Total Deductions',
-      value: '₹ 0',
+      value: 'AED 0',
       icon: 'money_off',
       color: 'green',
       change: '1.2%',
@@ -88,7 +88,7 @@ export class SalarySheetComponent implements OnInit {
 
     {
       title: 'Net Payable',
-      value: '₹ 0',
+      value: 'AED 0',
       icon: 'account_balance_wallet',
       color: 'orange',
       change: '3.8%',
@@ -293,7 +293,7 @@ export class SalarySheetComponent implements OnInit {
 
       {
         title: 'Gross Salary',
-        value: `₹ ${grossSalary.toLocaleString()}`,
+        value: `AED ${grossSalary.toLocaleString()}`,
         icon: 'payments',
         color: 'blue',
         change: '4.5%',
@@ -303,7 +303,7 @@ export class SalarySheetComponent implements OnInit {
 
       {
         title: 'Total Deductions',
-        value: `₹ ${totalDeductions.toLocaleString()}`,
+        value: `AED ${totalDeductions.toLocaleString()}`,
         icon: 'money_off',
         color: 'green',
         change: '1.2%',
@@ -313,7 +313,7 @@ export class SalarySheetComponent implements OnInit {
 
       {
         title: 'Net Payable',
-        value: `₹ ${netPayable.toLocaleString()}`,
+        value: `AED ${netPayable.toLocaleString()}`,
         icon: 'account_balance_wallet',
         color: 'orange',
         change: '3.8%',
